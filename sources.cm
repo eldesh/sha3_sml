@@ -1,0 +1,8 @@
+library(0.0.1)
+  structure ForLoop
+  structure BitArray
+  structure StateArray
+  structure State
+  structure Sha3
+is
+  src/sources.cm
