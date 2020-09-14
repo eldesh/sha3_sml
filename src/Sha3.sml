@@ -252,12 +252,22 @@ struct
   fun Rnd A ir =
     let
       val A' = Arr.clone A
+
+      fun dump label x =
+        (print (label ^ "\n");
+         Arr.dump (TextIO.stdOut, x)
+        )
     in
       step_mapping_theta   A';
+      dump "After Theta:"  A';
       step_mapping_rho     A';
+      dump "After Rho:"    A';
       step_mapping_pi      A';
+      dump "After Pi:"     A';
       step_mapping_chi     A';
+      dump "After Chi:"    A';
       step_mapping_iota ir A';
+      dump "After Iota:"   A';
       A'
     end
 
@@ -287,7 +297,10 @@ struct
     in
       (* step 2. *)
       for (12 + 2*l - nr) (fn ir => ir <= 12 + 2*l - 1) inc (fn ir =>
-        A := Rnd (!A) ir
+        (
+         print(concat["Round #", Int.toString ir, "\n"]);
+         A := Rnd (!A) ir
+        )
       );
       (* step 3 and 4. *)
       Arr.toState (!A)
@@ -312,6 +325,8 @@ struct
    *)
   fun sponge (f,b) pad r N d =
     let
+      val () = print "sponge:\n"
+      val () = BitArray.dump (TextIO.stdOut, N)
       val len = B.length
       (* step 1. *)
       val P = B.|| (N, pad r (len N))

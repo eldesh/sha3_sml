@@ -29,6 +29,8 @@ structure State :> sig
    * log 2 (b/25)
    *)
   val l : t -> int
+
+  val dump : TextIO.outstream * t -> unit
 end =
 struct
   structure Arr = BitArray
@@ -56,6 +58,8 @@ struct
 
   fun l (State ba) =
     Real.toInt IEEEReal.TO_NEAREST (log2 (real (Arr.length ba div 25)))
+
+  fun dump (out, State arr) = Arr.dump (out, arr)
 end
 
 

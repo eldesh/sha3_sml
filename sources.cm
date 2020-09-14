@@ -1,5 +1,6 @@
 library(0.0.1)
   structure ForLoop
+  structure Bit
   structure BitArray
   structure StateArray
   structure State

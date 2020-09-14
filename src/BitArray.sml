@@ -21,6 +21,8 @@ structure BitArray :> sig
   val || : t * t -> t
 
   val |+| : t * t -> t
+
+  val dump : TextIO.outstream * t -> unit
 end =
 struct
   structure W = Word8
@@ -130,7 +132,6 @@ struct
       val bits_xy = length x + length y
       val bytes = Array.array (bits_xy div W.wordSize +
                                 (if bits_xy mod W.wordSize <> 0 then 1 else 0), 0w0)
-      val () = print(concat["bytes: ", Int.toString (Array.length bytes), "\n"]);
     in
       Array.copy { di = 0, dst = bytes, src = bytesX };
       if bitsX = 0 then
@@ -146,7 +147,6 @@ struct
             let
               val e' = bytes // (lenX - 1 + i)
             in
-              print(concat["e': ", W.toString e', "\n"]);
               bytes := (lenX - 1 + i,
                 W.orb (e',
                   W.<< (W.andb (e, mask (W.wordSize - bitsX)), word bitsX)));
@@ -171,5 +171,23 @@ struct
       in
         T { bytes = bytes, bits = bitsX }
       end
+
+  local
+    structure IO = TextIO
+    structure Cvt = StringCvt
+  in
+  fun dump (out, T { bytes, bits }) =
+    let
+      fun out' ss = IO.output (out, ss)
+    in
+      for 0 (fn i => i < Array.length bytes) inc (fn i =>
+        ( out' (Cvt.padLeft #"0" 2 (W.fmt Cvt.HEX (Array.sub (bytes, i))));
+          out' (if i mod 16 = 15 then "\n" else " ")
+        )
+      );
+      out' "\n";
+      IO.flushOut out
+    end
+  end (* local *)
 end
 

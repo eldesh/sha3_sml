@@ -22,6 +22,8 @@ structure StateArray : sig
   val update : t * int * int * int * Bit.t -> unit
 
   val clone : t -> t
+
+  val dump : TextIO.outstream * t -> unit
 end =
 struct
   datatype t = A of State.t
@@ -40,5 +42,7 @@ struct
 
   fun clone (A state) =
     A (State.clone state)
+
+  fun dump (out, A state) = State.dump (out, state)
 end
 
