@@ -299,21 +299,20 @@ struct
   (**
    * Sponge function
    *
-   * Algorithm 8: SPONGE[f, pad, f](N, d)
+   * Algorithm 8: SPONGE[f, pad, r](N, d)
    *
    * @params f pad r N d
-   * @param f
+   * @param f mapping function for strings of fixed length b.
    * @param pad
    * @param r
-   * @param N string N
+   * @param N string N.
    * @param d nonnegative integer.
    *          determines the number of bits that this function returns.
    * @result string Z such that len(Z) = d.
    *)
-  fun sponge f pad r N d =
+  fun sponge (f,b) pad r N d =
     let
       val len = B.length
-      val b = 0 (* ??? *)
       (* step 1. *)
       val P = B.|| (N, pad r (len N))
       (* step 2. *)
@@ -389,7 +388,7 @@ struct
       open State
       val S = fromArray N
     in
-      sponge (toArray o keccak_p 1600 24 o fromArray) pad10s1 (1600 - c) N d
+      sponge (toArray o keccak_p 1600 24 o fromArray, 1600) pad10s1 (1600 - c) N d
     end
 
   local
