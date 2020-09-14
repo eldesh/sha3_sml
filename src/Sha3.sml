@@ -5,7 +5,6 @@ struct
   structure State = State
   structure Arr   = StateArray
 
-  exception InvalidSizeArray of BitArray.t
   exception InvalidSizeState of State.t
 
   (**
