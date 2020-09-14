@@ -20,14 +20,8 @@ structure State :> sig
 
   val clone : t -> t
 
-  (**
-   * b/25
-   *)
   val w : t -> int
 
-  (**
-   * log 2 (b/25)
-   *)
   val l : t -> int
 
   val dump : TextIO.outstream * t -> unit
@@ -52,10 +46,16 @@ struct
   fun clone (State arr) =
     State (Arr.clone arr)
 
+  (**
+   * b/25
+   *)
   fun w (State ba) = Arr.length ba div 25
 
   fun log2 x = (Math.log10 x) / (Math.log10 2.0)
 
+  (**
+   * log 2 (b/25)
+   *)
   fun l (State ba) =
     Real.toInt IEEEReal.TO_NEAREST (log2 (real (Arr.length ba div 25)))
 
