@@ -79,17 +79,17 @@ struct
     in
       (* step 3. *)
       for 0 (fn t => t <= 23) inc (fn t =>
-        for 0 (fn z => z < w) inc (fn z =>
-          (
-           (* step 3.a *)
-           Arr.update (A', !x, !y, z,
-             Arr.sub (A, !x, !y, (z - (t+1) * (t+2) div 2) mod w));
-           (* step 3.b *)
-           let val (x', y') = (!y, (2 * !x + 3 * !y) mod 5) in
-             x := x';
-             y := y'
-           end
-          )
+        (
+          (* step 3.a *)
+          for 0 (fn z => z < w) inc (fn z =>
+            Arr.update (A', !x, !y, z,
+              Arr.sub (A, !x, !y, (z - (t+1) * (t+2) div 2) mod w))
+          );
+          (* step 3.b *)
+          let val (x', y') = (!y, (2 * !x + 3 * !y) mod 5) in
+            x := x';
+            y := y'
+          end
         )
       );
       BitArray.copy { src = State.toArray (Arr.toState A')
@@ -215,7 +215,7 @@ struct
             for 1 (fn i => i <= t mod 255) inc (fn i =>
               (
                (* step 3.a *)
-               R := BitArray.|| (!R, `[Bit.O]);
+               R := BitArray.|| (`[Bit.O], !R);
                BitArray.update (!R, 0, Bit.xor (sub(!R, 0), sub(!R, 8)));
                BitArray.update (!R, 4, Bit.xor (sub(!R, 4), sub(!R, 8)));
                BitArray.update (!R, 5, Bit.xor (sub(!R, 5), sub(!R, 8)));
@@ -229,16 +229,16 @@ struct
       (* step 1. *)
       val A' = Arr.clone A
       (* step 2. *)
-      val RC = BitArray.fromVector (Vector.tabulate (w, fn _ => Bit.O))
+      val RC = BitArray.array w
     in
       (* step 3. *)
-      for 0 (fn j => j < l) inc (fn j =>
+      for 0 (fn j => j <= l) inc (fn j =>
         BitArray.update (RC, pow2 j - 1, rc (j + 7 * ir))
       );
       (* step 4. *)
       for 0 (fn z => z < w) inc (fn z =>
         Arr.update (A', 0, 0, z,
-          Bit.xor (Arr.sub (A, 0, 0, z),
+          Bit.xor (Arr.sub (A', 0, 0, z),
                    BitArray.sub (RC, z)))
       );
       BitArray.copy { src = State.toArray (Arr.toState A')
