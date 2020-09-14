@@ -398,12 +398,11 @@ struct
    * @param N input string.
    * @param d
    *)
-  fun keccak c N d =
+  fun keccak c =
     let
-      open State
-      val S = fromArray N
+      val (from, to) = (State.fromArray, State.toArray)
     in
-      sponge (toArray o keccak_p 1600 24 o fromArray, 1600) pad10s1 (1600 - c) N d
+      sponge (to o keccak_p 1600 24 o from, 1600) pad10s1 (1600 - c)
     end
 
   local
