@@ -199,7 +199,7 @@ struct
       (** Algorithm 5: rc(t)
        * @params t
        * @param t integer t.
-       * @result bit rc(t).
+       * @return bit rc(t).
        *)
       fun rc t =
         if t mod 255 = 0 then
@@ -285,7 +285,7 @@ struct
    * @param b  length of string S.
    * @param S  string S of length b.
    * @param nr number of rounds nr.
-   * @result S' of length b.
+   * @return S' of length b.
    *)
   fun keccak_p b nr S =
     let
@@ -320,7 +320,7 @@ struct
    * @param N string N.
    * @param d nonnegative integer.
    *          determines the number of bits that this function returns.
-   * @result string Z such that len(Z) = d.
+   * @return string Z such that len(Z) = d.
    *)
   fun sponge (f,b) pad r N d =
     let
@@ -372,7 +372,7 @@ struct
    * @params x m
    * @param x positive integer.
    * @param m non-negative integer.
-   * @result string P such that m + len(P) is a positive multiple of x.
+   * @return string P such that m + len(P) is a positive multiple of x.
    *)
   fun pad10s1 x m =
     let
