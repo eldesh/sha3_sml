@@ -5,6 +5,9 @@ struct
   structure State = State
   structure Arr   = StateArray
 
+  exception InvalidSizeArray of BitArray.t
+  exception InvalidSizeState of State.t
+
   (**
    * the 1st algorithm of step mappings: theta
    *
@@ -269,13 +272,15 @@ struct
    * And the permutation is defined for any b in {25, 50, 100, 200, 400, 800, 1600} and any positive integer nr.
    * </p>
    *
-   * @params S nr
+   * @params b nr S
+   * @param b  length of string S.
    * @param S  string S of length b.
    * @param nr number of rounds nr.
    * @result S' of length b.
    *)
-  fun keccak_p S nr =
+  fun keccak_p b nr S =
     let
+      val () = if b <> State.length S then raise InvalidSizeState S else ()
       val l = State.l S
       (* step 1. *)
       val A = ref (Arr.fromState S)
@@ -286,6 +291,105 @@ struct
       );
       (* step 3 and 4. *)
       Arr.toState (!A)
+    end
+
+  local
+    structure B = BitArray
+  in
+  (**
+   * Sponge function
+   *
+   * Algorithm 8: SPONGE[f, pad, f](N, d)
+   *
+   * @params f pad r N d
+   * @param f
+   * @param pad
+   * @param r
+   * @param N string N
+   * @param d nonnegative integer.
+   *          determines the number of bits that this function returns.
+   * @result string Z such that len(Z) = d.
+   *)
+  fun sponge f pad r N d =
+    let
+      val len = B.length
+      val b = 0 (* ??? *)
+      (* step 1. *)
+      val P = B.|| (N, pad r (len N))
+      (* step 2. *)
+      val n = len P div r
+      (* step 3. *)
+      val c = b - r
+      (* step 4. *)
+      val Pn = Vector.tabulate (n, fn i => B.range (P, i*r, r))
+      (* step 5. *)
+      val S = ref (B.array b)
+      (* step 6. *)
+      val () =
+        for 0 (fn i => i < n) inc (fn i =>
+          S := f (B.|+| (!S, B.|| (Vector.sub (Pn, i), B.array c))))
+      (* step 7. *)
+      val Z = ref (B.array 0)
+      val continue = ref true
+    in
+      while !continue do (
+        (* step 8. *)
+        Z := B.|| (!Z, Trunc r (!S));
+        (* step 9. *)
+        if d <= B.length (!Z) then
+          ( Trunc c (!Z);
+            continue := false )
+        else ();
+        (* step 10. *)
+        S := f (!S)
+      );
+      !Z
+    end
+  end (* local *)
+
+  local
+    structure B = BitArray
+  in
+  (**
+   * Padding function
+   *
+   * §5.1 Specification of pad10*1
+   * Algorithm 9: pad10*1(x, m)
+   *
+   * @params x m
+   * @param x positive integer.
+   * @param m non-negative integer.
+   * @result string P such that m + len(P) is a positive multiple of x.
+   *)
+  fun pad10s1 x m =
+    let
+      val () = if x <= 0 then raise Subscript else ()
+      val () = if m < 0 then raise Subscript else ()
+      val ` = B.fromVector o vector
+      (* step 1. *)
+      val j = (~m - 2) mod x
+    in
+      (* step 2. *)
+      B.|| (B.|| (`[Bit.I], B.array j), `[Bit.I])
+    end
+  end (* local *)
+
+  (**
+   * Specialized SPONGE and KECCAK-p functions
+   *
+   * §5.2 Specification of KECCAK[c]
+   *
+   * @params c N d
+   * @param c
+   * @param N input string.
+   * @param d
+   *)
+  fun keccak c N d =
+    let
+      open State
+      val S = fromArray N
+    in
+      sponge (toArray o keccak_p 1600 24 o fromArray) pad10s1 (1600 - c) N d
     end
 
 end

@@ -12,6 +12,8 @@ structure State :> sig
 
   val toArray : t -> BitArray.t
 
+  val length : t -> int
+
   val sub : t * int -> Bit.t
 
   val update : t * int * Bit.t -> unit
@@ -36,6 +38,8 @@ struct
   fun fromArray arr = State arr
 
   fun toArray (State arr) = arr
+
+  fun length (State arr) = Arr.length arr
 
   fun sub (State a, n) =
     Arr.sub (a, n)

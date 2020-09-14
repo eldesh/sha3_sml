@@ -16,12 +16,15 @@ structure BitArray :> sig
 
   val copy : { src: t, dst: t } -> unit
 
+  val range : t * int * int -> t
+
   val || : t * t -> t
 
   val |+| : t * t -> t
 end =
 struct
   structure W = Word8
+  open ForLoop
 
   datatype t = T of
     {
@@ -108,6 +111,19 @@ struct
       raise Size
     else
       Array.copy { di = 0, src = bytesS, dst = bytesD }
+
+  fun range (arr as T { bytes = bytesA, bits = bitsA }, from, size) : t =
+    let
+      val len = length arr
+      val () = if from < 0 orelse size < 0 then raise Subscript else ()
+      val () = if len < from + size then raise Subscript else ()
+      val arr' = array size
+    in
+      for 0 (fn i => i < size) inc (fn i =>
+        update (arr', i, sub (arr, from + i))
+      );
+      arr'
+    end
 
   fun || (x as T { bytes = bytesX, bits = bitsX }, y as T { bytes = bytesY, ... }) =
     let
