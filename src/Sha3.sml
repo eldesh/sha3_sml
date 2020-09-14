@@ -392,5 +392,45 @@ struct
       sponge (toArray o keccak_p 1600 24 o fromArray) pad10s1 (1600 - c) N d
     end
 
+  local
+    infix ||
+    val op|| = BitArray.||
+    val ` = BitArray.fromVector o vector
+  in
+  (**
+   * SHA3-224
+   * SHA-3 hash function is defined from the KECCAK[c] function.
+   *
+   * @param M A given message.
+   *)
+  fun sha3_224 M =
+    keccak 448 (M || `[Bit.O, Bit.I]) 224
+
+  (**
+   * SHA3-256
+   *
+   * @param M A given message.
+   *)
+  fun sha3_256 M =
+    keccak 512 (M || `[Bit.O, Bit.I]) 256
+
+  (**
+   * SHA3-384
+   *
+   * @param M A given message.
+   *)
+  fun sha3_384 M =
+    keccak 768 (M || `[Bit.O, Bit.I]) 384
+
+  (**
+   * SHA3-512
+   *
+   * @param M A given message.
+   *)
+  fun sha3_512 M =
+    keccak 1024 (M || `[Bit.O, Bit.I]) 512
+
+  end (* local *)
+
 end
 
