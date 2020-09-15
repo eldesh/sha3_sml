@@ -362,11 +362,11 @@ struct
         Z := B.|| (!Z, Trunc r (!S));
         (* step 9. *)
         if d <= B.length (!Z) then
-          ( Trunc c (!Z);
+          ( Z := Trunc d (!Z);
             continue := false )
-        else ();
-        (* step 10. *)
-        S := f (!S)
+        else
+          (* step 10. *)
+          S := f (!S)
       );
       !Z
     end
