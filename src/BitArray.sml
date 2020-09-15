@@ -150,7 +150,7 @@ struct
               bytes := (lenX - 1 + i,
                 W.orb (e',
                   W.<< (W.andb (e, mask (W.wordSize - bitsX)), word bitsX)));
-              if i < lenY-1 then
+              if lenX + i < Array.length bytes then
                 bytes := (lenX + i,
                   W.>> (W.andb (e, W.<< (mask bitsX, word (W.wordSize - bitsX)))
                        , word (W.wordSize - bitsX)))
