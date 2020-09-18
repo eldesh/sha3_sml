@@ -6,6 +6,10 @@ structure BitArray :> sig
 
   val fromVector : Bit.t vector -> t
 
+  val fromWordVector : Word8.word vector -> t
+
+  val vector : t -> Word8.word vector
+
   val length : t -> int
 
   val sub : t * int -> Bit.t
@@ -33,6 +37,16 @@ struct
       bytes: W.word Array.array,
       bits: int
     }
+
+  fun fromWordVector vec =
+    let
+      val bytes = Array.array (Vector.length vec, 0w0)
+    in
+      Array.copyVec { di = 0, src = vec, dst = bytes };
+      T { bytes = bytes, bits = 0 }
+    end
+
+  fun vector (T { bytes, ... }) = Array.vector bytes
 
   fun array n =
     let

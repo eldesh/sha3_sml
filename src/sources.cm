@@ -6,4 +6,7 @@ is
   BitArray.sml
   State.sml
   StateArray.sml
+  Keccak.sml
+  Sha3Kind.sml
+  SHA3.sig
   Sha3.sml

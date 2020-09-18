@@ -4,6 +4,9 @@ library(0.0.1)
   structure BitArray
   structure StateArray
   structure State
+  structure Keccak
+  structure Sha3Kind
   structure Sha3
+  signature SHA3
 is
   src/sources.cm
