@@ -20,6 +20,10 @@ sig
 
   (**
    * Hash a string
+   *
+   * @params kind m
+   * @param kind kind of hash
+   * @param m input message string
    *)
   val hashString : Sha3Kind.t -> string -> t
 end

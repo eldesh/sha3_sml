@@ -15,9 +15,7 @@ struct
     case f e
       of SOME (x, e') => x :: unfold f e'
        | NONE         => []
-  (**
-   * Read a value of type t from HEX string
-   *)
+
   fun fromHexString str =
     let
       fun get ss =
@@ -40,9 +38,6 @@ struct
     end
   end
 
-  (**
-   * Convert to string
-   *)
   fun toString (T vec) =
     let
       val strs =
@@ -56,13 +51,6 @@ struct
       concat (rev strs)
     end
 
-  (**
-   * Hash a string
-   *
-   * @params kind m
-   * @param kind kind of hash
-   * @param m input message string
-   *)
   fun hashString kind m =
     let
       val M = BitArray.fromWordVector
