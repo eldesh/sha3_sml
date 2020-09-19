@@ -56,7 +56,7 @@ struct
     else (* 0 < Array.length bytes *)
       let
         val last = Array.sub (bytes, Array.length bytes - 1)
-        val mask = W.<< (0w1, Word.fromInt (W.wordSize - bits)) - 0w1
+        val mask = W.<< (0w1, Word.fromInt ((W.wordSize - bits) mod W.wordSize)) - 0w1
       in
         if W.andb (last, W.<< (mask, Word.fromInt bits)) <> 0w0 then
           invariant_err ["remainder bits of the last word should be 0: ", word last]
