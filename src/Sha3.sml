@@ -51,19 +51,28 @@ struct
       concat (rev strs)
     end
 
+  fun hashBitArray kind =
+    case kind
+      of Sha3_224 => Keccak.sha3_224
+       | Sha3_256 => Keccak.sha3_256
+       | Sha3_384 => Keccak.sha3_384
+       | Sha3_512 => Keccak.sha3_512
+
   fun hashString kind m =
     let
       val M = BitArray.fromWordVector
                 (vector
-                  (map (Word8.fromInt o ord) (explode m)))
-      val M' =
-        case kind
-          of Sha3_224 => Keccak.sha3_224 M
-           | Sha3_256 => Keccak.sha3_256 M
-           | Sha3_384 => Keccak.sha3_384 M
-           | Sha3_512 => Keccak.sha3_512 M
+                  (map (Word8.fromInt o ord) (explode m)), 0)
     in
-      T (BitArray.vector M')
+      T (BitArray.vector (hashBitArray kind M))
     end
+
+  fun hashVector kind (m, oddm) =
+    let
+      val M = BitArray.fromWordVector (m, oddm)
+    in
+      T (BitArray.vector (hashBitArray kind M))
+    end
+
 end
 

@@ -6,7 +6,7 @@ structure BitArray :> sig
 
   val fromVector : Bit.t vector -> t
 
-  val fromWordVector : Word8.word vector -> t
+  val fromWordVector : Word8.word vector * int -> t
 
   val vector : t -> Word8.word vector
 
@@ -38,12 +38,39 @@ struct
       bits: int
     }
 
-  fun fromWordVector vec =
+  exception InvariantError of string
+
+  fun invariant_err ss = raise InvariantError (concat ss)
+
+  local
+    val int = Int.toString
+    val word = W.toString
+  in
+  fun fromWordArray { bytes: W.word Array.array, bits: int } =
+    if bits < 0 orelse W.wordSize <= bits then (* invalid range *)
+      invariant_err ["bits must be in the range of [0,8): ", int bits]
+    else if Array.length bytes = 0 andalso bits <> 0 then (* invalid odd bits *)
+      invariant_err ["length bytes = 0 -> bits = 0: ", int bits]
+    else if Array.length bytes = 0 then (* empty *)
+      T { bytes = bytes, bits = bits }
+    else (* 0 < Array.length bytes *)
+      let
+        val last = Array.sub (bytes, Array.length bytes - 1)
+        val mask = W.<< (0w1, Word.fromInt (W.wordSize - bits)) - 0w1
+      in
+        if W.andb (last, W.<< (mask, Word.fromInt bits)) <> 0w0 then
+          invariant_err ["remainder bits of the last word should be 0: ", word last]
+        else
+          T { bytes = bytes, bits = bits }
+      end
+  end (* local *)
+
+  fun fromWordVector (vec, oddm) =
     let
       val bytes = Array.array (Vector.length vec, 0w0)
     in
       Array.copyVec { di = 0, src = vec, dst = bytes };
-      T { bytes = bytes, bits = 0 }
+      fromWordArray { bytes = bytes, bits = oddm }
     end
 
   fun vector (T { bytes, ... }) = Array.vector bytes
