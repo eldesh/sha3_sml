@@ -14,6 +14,12 @@ struct
 
   local
     fun hash (ws, odd) = Sha3.hashVector Sha3_224 (vector ws, odd)
+    fun unfoldr f e =
+      case f e
+        of SOME (x, e') => x :: unfoldr f e'
+         | NONE => []
+    fun rep n xs =
+      List.concat (unfoldr (fn 0 => NONE | n => SOME (xs, n-1)) n)
   in
     fun test_sha3_224 () =
       $("sha3_224",
@@ -25,7 +31,16 @@ struct
                                  (hash ([0wx13], 5)))),
            $("SHA3-224_Msg30",
               %(fn()=> assert_eq (`"D666A514CC9DBA25AC1BA69ED3930460DEAAC9851B5F0BAAB007DF3B")
-                                 (hash ([0wx53, 0wx58, 0wx7B, 0wx19], 6))))
+                                 (hash ([0wx53, 0wx58, 0wx7B, 0wx19], 6)))),
+           $("SHA3-224_1600",
+              %(fn()=> assert_eq (`"9376816ABA503F72F96CE7EB65AC095DEEE3BE4BF9BBC2A1CB7E11E0")
+                                 (hash (rep 200 [0wxA3], 0)))),
+           $("SHA3-224_1605",
+              %(fn()=> assert_eq (`"22D2F7BB0B173FD8C19686F9173166E3EE62738047D7EADD69EFB228")
+                                 (hash (rep 200 [0wxA3] @ [0wx03], 5)))),
+           $("SHA3-224_1630",
+              %(fn()=> assert_eq (`"4E907BB1057861F200A599E9D4F85B02D88453BF5B8ACE9AC589134C")
+                                 (hash (rep 203 [0wxA3] @ [0wx23], 6))))
         ])
   end
 
