@@ -49,5 +49,6 @@ clean:
 	-$(RM) -r $(DOCDIR)
 	-$(RM) $(TEST_TARGET)
 	-$(RM) -r .cm
+	-$(RM) -r src/.cm
 	-$(RM) -r test/.cm
 
