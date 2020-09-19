@@ -8,6 +8,23 @@ struct
   exception InvalidSizeState of State.t
 
   (**
+   * A flag toggles whether this module outputs intermediate values or not.
+   *)
+  val debug = ref false
+
+  (**
+   * debug dump
+   *)
+  fun dump label x =
+    if !debug then
+      (
+        print (label ^ "\n");
+        Arr.dump (TextIO.stdOut, x)
+      )
+    else
+      ()
+
+  (**
    * the 1st algorithm of step mappings: theta
    *
    * §3.2.1 Algorithm 1: theta(A)
@@ -263,11 +280,6 @@ struct
   fun Rnd A ir =
     let
       val A' = Arr.clone A
-
-      fun dump label x =
-        (print (label ^ "\n");
-         Arr.dump (TextIO.stdOut, x)
-        )
     in
       step_mapping_theta   A';
       dump "After Theta:"  A';
@@ -309,7 +321,7 @@ struct
       (* step 2. *)
       for (12 + 2*l - nr) (fn ir => ir <= 12 + 2*l - 1) inc (fn ir =>
         (
-         print(concat["Round #", Int.toString ir, "\n"]);
+         if !debug then print(concat["Round #", Int.toString ir, "\n"]) else ();
          A := Rnd (!A) ir
         )
       );
@@ -336,8 +348,8 @@ struct
    *)
   fun sponge (f,b) pad r N d =
     let
-      val () = print "sponge:\n"
-      val () = BitArray.dump (TextIO.stdOut, N)
+      val () = if !debug then (print "sponge:\n"; BitArray.dump (TextIO.stdOut, N))
+               else ()
       val len = B.length
       (* step 1. *)
       val P = B.|| (N, pad r (len N))
