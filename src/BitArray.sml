@@ -81,7 +81,7 @@ struct
       val bits = n mod w
       val bytes = Array.array (n div w + (if bits <> 0 then 1 else 0), 0w0)
     in
-      T { bytes = bytes, bits = bits }
+      fromWordArray { bytes = bytes, bits = bits }
     end
 
   fun length (T { bytes, bits }) =
@@ -145,7 +145,7 @@ struct
       val bytes' = Array.array (Array.length bytes, 0w0)
     in
       Array.copy { di = 0, src = bytes, dst = bytes' };
-      T { bytes = bytes', bits = bits }
+      fromWordArray { bytes = bytes', bits = bits }
     end
 
   fun copy { src = src as T { bytes = bytesS, bits = bitsS }
@@ -158,7 +158,8 @@ struct
   fun range (arr as T { bytes = bytesA, bits = bitsA }, from, size) : t =
     let
       val len = length arr
-      val () = if from < 0 orelse size < 0 then raise Subscript else ()
+      val () = if from < 0 orelse len <= from then raise Subscript else ()
+      val () = if size < 0                    then raise Subscript else ()
       val () = if len < from + size then raise Subscript else ()
       val arr' = array size
     in
@@ -198,7 +199,7 @@ struct
               else ()
             end) bytesY
         end;
-      T { bytes = bytes, bits = bits_xy mod W.wordSize }
+      fromWordArray { bytes = bytes, bits = bits_xy mod W.wordSize }
     end
 
   fun |+| (x as T { bytes = bytesX, bits = bitsX }, y as T { bytes = bytesY, ... }) =
@@ -210,7 +211,7 @@ struct
                       W.xorb (bytesX // n,
                               bytesY // n))
       in
-        T { bytes = bytes, bits = bitsX }
+        fromWordArray { bytes = bytes, bits = bitsX }
       end
 
   local
