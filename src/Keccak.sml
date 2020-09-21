@@ -340,7 +340,7 @@ struct
    * @params f pad r N d
    * @param f mapping function for strings of fixed length b.
    * @param pad
-   * @param r
+   * @param r rate (1600-c(bits)).
    * @param N string N.
    * @param d nonnegative integer.
    *          determines the number of bits that this function returns.
@@ -417,7 +417,7 @@ struct
    * §5.2 Specification of KECCAK[c]
    *
    * @params c N d
-   * @param c
+   * @param c capacity (c = 2d).
    * @param N input string.
    * @param d
    *)
