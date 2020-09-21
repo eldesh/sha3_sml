@@ -126,9 +126,33 @@ struct
        , test_sha3_512 ()
        ])
 
+  fun short_messages_test () =
+    $("ShortMessagesTest", &[])
+
+  fun long_messages_test () =
+    $("LongMessagesTest", &[])
+
+  fun pseudorandomly_generated_messages_test () =
+    $("PseudorandomlyGeneratedMessagesTest", &[])
+
+  (**
+   * Tests for SHA3 Validation System Test Vectors
+   * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
+   *
+   * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
+   *)
+  fun test_sha3vs () =
+    $("test_sha3vs",
+      &[ short_messages_test (),
+         long_messages_test (),
+         pseudorandomly_generated_messages_test ()
+       ])
+
   fun test () =
     $("test",
-      &[ test_example_values () ])
+      &[ test_example_values (),
+         test_sha3vs ()
+       ])
 
   fun main (_, _) =
     (TextUITestRunner.runTest {output=TextIO.stdOut} (test());
