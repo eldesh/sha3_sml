@@ -126,14 +126,31 @@ struct
        , test_sha3_512 ()
        ])
 
+  local
+    fun hash kind = Sha3.hashVector kind
+    fun read_test_case path =
+      let val (kind, cases) = Sha3VS.parse path in
+        $(OS.Path.file path,
+            &(map (fn {msg, digest} =>
+                     %(fn()=> assert_eq (`digest) (hash kind msg)))
+                cases))
+      end
+  in
   fun short_messages_test () =
-    $("ShortMessagesTest", &[])
+    $("ShortMessagesTest",
+      &(map read_test_case
+          [ "test/sha3_bytetestvectors/SHA3_224ShortMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_256ShortMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_384ShortMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_512ShortMsg.rsp"
+          ]))
 
   fun long_messages_test () =
     $("LongMessagesTest", &[])
 
   fun pseudorandomly_generated_messages_test () =
     $("PseudorandomlyGeneratedMessagesTest", &[])
+  end (* local *)
 
   (**
    * Tests for SHA3 Validation System Test Vectors
