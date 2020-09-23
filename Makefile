@@ -28,6 +28,7 @@ doc: sources.cm $(SRC)
 	$(SMLDOC) -c UTF-8 \
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
+		--builtinstructure=VectorSlice \
 		--hidebysig \
 		--recursive \
 		--linksource \

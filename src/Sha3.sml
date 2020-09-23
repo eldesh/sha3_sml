@@ -74,5 +74,12 @@ struct
       T (BitArray.vector (hashBitArray kind M))
     end
 
+  fun hashVectorSlice kind (m, oddm) =
+    let
+      val M = BitArray.fromWordVector (VectorSlice.vector m, oddm)
+    in
+      T (BitArray.vector (hashBitArray kind M))
+    end
+
 end
 
