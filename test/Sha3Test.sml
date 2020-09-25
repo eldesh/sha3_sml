@@ -146,7 +146,13 @@ struct
           ]))
 
   fun long_messages_test () =
-    $("LongMessagesTest", &[])
+    $("LongMessagesTest",
+      &(map read_test_case
+          [ "test/sha3_bytetestvectors/SHA3_224LongMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_256LongMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_384LongMsg.rsp"
+          , "test/sha3_bytetestvectors/SHA3_512LongMsg.rsp"
+          ]))
 
   fun pseudorandomly_generated_messages_test () =
     $("PseudorandomlyGeneratedMessagesTest", &[])
