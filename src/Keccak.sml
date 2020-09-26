@@ -253,6 +253,7 @@ struct
             sub (!R, 0)
           end
       val w = State.w (Arr.toState A)
+      val timer = Measure.start ()
       (* step 1. *)
       val A' = Arr.clone A
       (* step 2. *)
@@ -262,6 +263,7 @@ struct
       for 0 (fn j => j <= l) inc (fn j =>
         BitArray.update (RC, pow2 j - 1, rc (j + 7 * ir))
       );
+      Measure.check "Iota: step3:" timer;
       (* step 4. *)
       for 0 (fn z => z < w) inc (fn z =>
         Arr.update (A', 0, 0, z,
@@ -270,6 +272,7 @@ struct
       );
       BitArray.copy { src = State.toArray (Arr.toState A')
                     , dst = State.toArray (Arr.toState A ) }
+      Measure.check "Iota: step4:" timer
     end
 
   (**
@@ -285,18 +288,24 @@ struct
    *)
   fun Rnd A ir =
     let
+      val timer = Measure.start ()
       val A' = Arr.clone A
     in
       step_mapping_theta   A';
       dump "After Theta:"  A';
+      Measure.check "Rnd: Theta:" timer;
       step_mapping_rho     A';
       dump "After Rho:"    A';
+      Measure.check "Rnd:   Rho:" timer;
       step_mapping_pi      A';
       dump "After Pi:"     A';
+      Measure.check "Rnd:    Pi:" timer;
       step_mapping_chi     A';
       dump "After Chi:"    A';
+      Measure.check "Rnd:   Chi:" timer;
       step_mapping_iota ir A';
       dump "After Iota:"   A';
+      Measure.check "Rnd:  Iota:" timer;
       A'
     end
 
@@ -319,10 +328,12 @@ struct
    *)
   fun keccak_p b nr S =
     let
+      val timer = Measure.start ()
       val () = if b <> State.length S then raise InvalidSizeState S else ()
       val l = State.l S
       (* step 1. *)
       val A = ref (Arr.fromState S)
+      val () = Measure.check "keccak_p: step1:" timer
     in
       (* step 2. *)
       for (12 + 2*l - nr) (fn ir => ir <= 12 + 2*l - 1) inc (fn ir =>
@@ -331,6 +342,7 @@ struct
          A := Rnd (!A) ir
         )
       );
+      Measure.check "keccak_p: step2:" timer;
       (* step 3 and 4. *)
       Arr.toState (!A)
     end
@@ -357,6 +369,7 @@ struct
       val () = if !debug then (print "sponge:\n"; BitArray.dump (TextIO.stdOut, N))
                else ()
       val len = B.length
+      val timer = Measure.start ()
       (* step 1. *)
       val P = N || (pad r (len N))
       (* step 2. *)
@@ -367,10 +380,12 @@ struct
       val Pn = Vector.tabulate (n, fn i => B.range (P, i*r, r))
       (* step 5. *)
       val S = ref (B.array b)
+      val () = Measure.check "sponge: step5:" timer
       (* step 6. *)
       val () =
         for 0 (fn i => i < n) inc (fn i =>
           S := f (!S |+| (Vector.sub (Pn, i) || (B.array c))))
+      val () = Measure.check "sponge: step6:" timer
       (* step 7. *)
       val Z = ref (B.array 0)
       val continue = ref true
@@ -384,7 +399,8 @@ struct
             continue := false )
         else
           (* step 10. *)
-          S := f (!S)
+          S := f (!S);
+        Measure.check "sponge: step10:" timer
       );
       !Z
     end

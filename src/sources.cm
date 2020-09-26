@@ -2,6 +2,7 @@ group
 is
   $/basis-2004.cm
   ForLoop.sml
+  Measure.sml
   Bit.sml
   BIT_ARRAY.sig
   BitArray.sml
