@@ -7,6 +7,12 @@ struct
 
   exception InvalidSizeState of State.t
 
+  infix 4 ||
+  val op|| = BitArray.||
+
+  infix 4 |+|
+  val op|+| = BitArray.|+|
+
   (**
    * A flag toggles whether this module outputs intermediate values or not.
    *)
@@ -231,7 +237,7 @@ struct
             for 1 (fn i => i <= t mod 255) inc (fn i =>
               (
                (* step 3.a *)
-               R := BitArray.|| (`[Bit.O], !R);
+               R := `[Bit.O] || !R;
                (* step 3.b *)
                BitArray.update (!R, 0, Bit.xor (sub(!R, 0), sub(!R, 8)));
                (* step 3.c *)
@@ -352,7 +358,7 @@ struct
                else ()
       val len = B.length
       (* step 1. *)
-      val P = B.|| (N, pad r (len N))
+      val P = N || (pad r (len N))
       (* step 2. *)
       val n = len P div r
       (* step 3. *)
@@ -364,14 +370,14 @@ struct
       (* step 6. *)
       val () =
         for 0 (fn i => i < n) inc (fn i =>
-          S := f (B.|+| (!S, B.|| (Vector.sub (Pn, i), B.array c))))
+          S := f (!S |+| (Vector.sub (Pn, i) || (B.array c))))
       (* step 7. *)
       val Z = ref (B.array 0)
       val continue = ref true
     in
       while !continue do (
         (* step 8. *)
-        Z := B.|| (!Z, Trunc r (!S));
+        Z := !Z || (Trunc r (!S));
         (* step 9. *)
         if d <= B.length (!Z) then
           ( Z := Trunc d (!Z);
@@ -407,7 +413,7 @@ struct
       val j = (~m - 2) mod x
     in
       (* step 2. *)
-      B.|| (B.|| (`[Bit.I], B.array j), `[Bit.I])
+      `[Bit.I] || B.array j || `[Bit.I]
     end
   end (* local *)
 
@@ -429,8 +435,6 @@ struct
     end
 
   local
-    infix ||
-    val op|| = BitArray.||
     val ` = BitArray.fromVector o vector
   in
   (**
