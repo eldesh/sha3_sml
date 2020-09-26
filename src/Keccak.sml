@@ -182,8 +182,9 @@ struct
    * of bits X[0] to X[s-1]. For example, Trunc_2(10100) = 10.
    *
    * @params s X
-   * @param s
-   * @param X
+   * @param s positive integer
+   * @param X bit string
+   * @return X[0..s-1]
    *)
   fun Trunc s X =
     let
