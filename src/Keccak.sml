@@ -230,28 +230,33 @@ struct
           Bit.I
         else
           let
-            val ` = BitArray.fromVector o vector
-            val sub = BitArray.sub
-            val R = ref (`[ Bit.I, Bit.O, Bit.O, Bit.O
-                          , Bit.O, Bit.O, Bit.O, Bit.O ])
+            fun sub (x, n) =
+              if Word32.andb (x, Word32.<< (0w1, n)) <> 0w0
+              then Bit.I else Bit.O
+
+            fun update (x, n, b) =
+              case b
+                of Bit.I => Word32.orb (x,              Word32.<< (0w1, n))
+                 | Bit.O => Word32.andb(x, Word32.notb (Word32.<< (0w1, n)))
+
+            val R: Word32.word ref = ref 0wx01
           in
             for 1 (fn i => i <= t mod 255) inc (fn i =>
-              (
-               (* step 3.a *)
-               R := `[Bit.O] || !R;
-               (* step 3.b *)
-               BitArray.update (!R, 0, Bit.xor (sub(!R, 0), sub(!R, 8)));
-               (* step 3.c *)
-               BitArray.update (!R, 4, Bit.xor (sub(!R, 4), sub(!R, 8)));
-               (* step 3.d *)
-               BitArray.update (!R, 5, Bit.xor (sub(!R, 5), sub(!R, 8)));
-               (* step 3.e *)
-               BitArray.update (!R, 6, Bit.xor (sub(!R, 6), sub(!R, 8)));
-               (* step 3.f *)
-               R := Trunc 8 (!R)
-              )
-            );
-            sub (!R, 0)
+              let val R8 = sub (!R, 0w7) in
+                (* step 3.a *)
+                R := Word32.<< (!R, 0w1);
+                (* step 3.b *)
+                R := update (!R, 0w0, Bit.xor (sub(!R, 0w0), R8));
+                (* step 3.c *)
+                R := update (!R, 0w4, Bit.xor (sub(!R, 0w4), R8));
+                (* step 3.d *)
+                R := update (!R, 0w5, Bit.xor (sub(!R, 0w5), R8));
+                (* step 3.e *)
+                R := update (!R, 0w6, Bit.xor (sub(!R, 0w6), R8));
+                (* step 3.f *)
+                R := Word32.andb (!R, 0wxFF)
+              end);
+            sub (!R, 0w0)
           end
       val w = State.w (Arr.toState A)
       val timer = Measure.start ()
