@@ -153,9 +153,43 @@ struct
           , "test/sha3_bytetestvectors/SHA3_384LongMsg.rsp"
           , "test/sha3_bytetestvectors/SHA3_512LongMsg.rsp"
           ]))
+  end (* local *)
 
+  local
+    fun rep f n x =
+      let
+        fun go i e =
+          if i = n then ( (* print "\n"; *) e )
+          else
+            ( (* print(concat["rep: ", Int.toString i, ": ", Sha3.toString e, "\r"]); *)
+              go (i+1) (f e)
+            )
+      in go 0 x end
+
+    fun hash' kind hash = Sha3.hashVector kind (Sha3.toVector hash, 0)
+
+    fun read_test_monte path =
+      let val (kind, seed, cases) = Sha3VS.parse_monte path in
+        $(OS.Path.file path,
+            %(fn () =>
+                ignore (foldl (fn ({ count, digest }, MD) =>
+                  let val MD1000 = rep (hash' kind) 1000 MD in
+                    (* print(concat["COUNT = ", Int.toString count, " MD: ", digest, "\n"]); *)
+                    assert_eq (`digest) MD1000;
+                    MD1000
+                  end)
+                (`seed)
+                cases)))
+      end
+  in
   fun pseudorandomly_generated_messages_test () =
-    $("PseudorandomlyGeneratedMessagesTest", &[])
+    $("PseudorandomlyGeneratedMessagesTest",
+      &(map read_test_monte
+          [ "test/sha3_bytetestvectors/SHA3_224Monte.rsp"
+          , "test/sha3_bytetestvectors/SHA3_256Monte.rsp"
+          , "test/sha3_bytetestvectors/SHA3_384Monte.rsp"
+          , "test/sha3_bytetestvectors/SHA3_512Monte.rsp"
+          ]))
   end (* local *)
 
   (**

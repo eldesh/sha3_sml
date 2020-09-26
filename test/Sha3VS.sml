@@ -3,8 +3,13 @@ structure Sha3VS =
 struct
   structure IO = TextIO.StreamIO
   structure SS = Substring
+
   structure Case = struct
     type t = { msg: Word8.word vector * int, digest: string }
+  end
+
+  structure MonteCase = struct
+    type t = { count: int, digest: string }
   end
 
   type ('r, 's) reader = ('r, 's) StringCvt.reader
@@ -89,6 +94,14 @@ struct
       (fn x => (x, s))
       (Int.fromString len_line))
 
+  fun scan_count r s =
+    bind (satisfy2_scan (S.isPrefix "COUNT = ")
+                        (fn x => S.extract (x, 8, NONE)) r s)
+                        (fn (len_line, s) =>
+    Option.map
+      (fn x => (x, s))
+      (Int.fromString len_line))
+
   (* trim control chars from the right end of a string *)
   fun trimr ss =
     let val (l, _) = SS.splitr Char.isCntrl (SS.full ss)
@@ -105,10 +118,17 @@ struct
       SOME (Vector.map (valOf o Word8.fromString) msgs, s)
     end)
 
+  (* scan hex string *)
+  fun scan_seed r s =
+    bind (satisfy2_scan (String.isPrefix "Seed = ")
+                        (fn s => String.extract (s, 7, NONE)) r s)
+                        (fn (seed_line, s) =>
+    SOME (trimr seed_line, s))
+
   fun scan_md r (s: 's) : (string * 's) option =
     bind (satisfy2_scan (S.isPrefix "MD = " )
                         (fn x => S.extract (x, 5, NONE)) r s)
-                        (fn (md_line , s) =>
+                        (fn (md_line, s) =>
     SOME (trimr md_line, s))
 
   fun scan_case r s =
@@ -118,6 +138,14 @@ struct
     bind (scan_md         r s) (fn (md , s) =>
     SOME ({ msg = (msg, len mod 8), digest = md }, s)
     ))))
+
+  fun scan_mcase r s =
+    bind (skip_blank_line r s) (fn (    _, s) =>
+    bind (scan_count      r s) (fn (count, s) =>
+    bind (scan_md         r s) (fn (   md, s) =>
+    SOME ({ count = count, digest = md }, s)
+    )))
+
   end (* local *)
 
   fun read_file path f =
@@ -127,6 +155,9 @@ struct
       f file handle e => (TextIO.closeIn file; raise e)
     end
 
+  (**
+   * parse Short and Long Messages file
+   *)
   fun parse path : Sha3Kind.t * Case.t list =
     read_file path (fn file =>
     let
@@ -144,6 +175,32 @@ struct
         else NONE)))))
     in
       (kind, cases)
+    end)
+
+  (**
+   * parse Monte (pseudo randomly generated) Messages file
+   *
+   * @return Kind * Seed * Message digests
+   *)
+  fun parse_monte path : Sha3Kind.t * string * MonteCase.t list =
+    read_file path (fn file =>
+    let
+      val strm = TextIO.getInstream file
+      val line = IO.inputLine
+      fun tt _ = true
+      val SOME (kind, seed, cases) =
+        bind (skip_comment    line strm)      (fn (   _, strm) =>
+        bind (skip_blank_line line strm)      (fn (   _, strm) =>
+        bind (scan_kind       line strm)      (fn (kind, strm) =>
+        bind (skip_blank_line line strm)      (fn (   _, strm) =>
+        bind (scan_seed       line strm)      (fn (seed, strm) =>
+        bind (list tt (scan_mcase line) strm) (fn (  cs, strm) =>
+        bind (skip_blank_line line strm)      (fn (   _, strm) =>
+        if IO.endOfStream strm
+        then SOME (kind, seed, cs)
+        else NONE)))))))
+    in
+      (kind, seed, cases)
     end)
 
 end
