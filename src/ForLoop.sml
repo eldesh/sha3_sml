@@ -16,6 +16,6 @@ struct
     end
 
   fun for' i cond =
-    for i cond (fn i=>i+1)
+    for i cond inc
 end
 

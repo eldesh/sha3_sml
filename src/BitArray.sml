@@ -1,33 +1,5 @@
 
-structure BitArray :> sig
-  type t
-
-  val array : int -> t
-
-  val fromVector : Bit.t vector -> t
-
-  val fromWordVector : Word8.word vector * int -> t
-
-  val vector : t -> Word8.word vector
-
-  val length : t -> int
-
-  val sub : t * int -> Bit.t
-
-  val update : t * int * Bit.t -> unit
-
-  val clone : t -> t
-
-  val copy : { src: t, dst: t } -> unit
-
-  val range : t * int * int -> t
-
-  val || : t * t -> t
-
-  val |+| : t * t -> t
-
-  val dump : TextIO.outstream * t -> unit
-end =
+structure BitArray :> BIT_ARRAY =
 struct
   structure W = Word8
   open ForLoop
@@ -42,6 +14,13 @@ struct
 
   fun invariant_err ss = raise InvariantError (concat ss)
 
+  infix 5 :=
+  fun a := (n, e) = Array.update (a, n, e)
+
+  infix 6 //
+  fun a // n = Array.sub (a, n)
+
+
   local
     val int = Int.toString
     val word = W.toString
@@ -55,7 +34,7 @@ struct
       T { bytes = bytes, bits = bits }
     else (* 0 < Array.length bytes *)
       let
-        val last = Array.sub (bytes, Array.length bytes - 1)
+        val last = bytes // (Array.length bytes - 1)
         val mask = W.<< (0w1, Word.fromInt ((W.wordSize - bits) mod W.wordSize)) - 0w1
       in
         if W.andb (last, W.<< (mask, Word.fromInt bits)) <> 0w0 then
@@ -88,12 +67,6 @@ struct
     let val len = Array.length bytes in
       len * W.wordSize - (W.wordSize - bits) mod W.wordSize
     end
-
-  infix 5 :=
-  fun a := (n, e) = Array.update (a, n, e)
-
-  infix 6 //
-  fun a // n = Array.sub (a, n)
 
   fun sub (vec as T { bytes, ... }, n) : Bit.t =
     let
@@ -223,7 +196,7 @@ struct
       fun out' ss = IO.output (out, ss)
     in
       for 0 (fn i => i < Array.length bytes) inc (fn i =>
-        ( out' (Cvt.padLeft #"0" 2 (W.fmt Cvt.HEX (Array.sub (bytes, i))));
+        ( out' (Cvt.padLeft #"0" 2 (W.fmt Cvt.HEX (bytes // i)));
           out' (if i mod 16 = 15 then "\n" else " ")
         )
       );

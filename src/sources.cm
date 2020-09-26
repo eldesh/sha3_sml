@@ -3,7 +3,10 @@ is
   $/basis-2004.cm
   ForLoop.sml
   Bit.sml
+  BIT_ARRAY.sig
   BitArray.sml
+  BIT_VECTOR.sig
+  BitVector.sml
   State.sml
   StateArray.sml
   Keccak.sml

@@ -2,6 +2,7 @@ library(0.0.1)
   structure ForLoop
   structure Bit
   structure BitArray
+  structure BitVector
   structure StateArray
   structure State
   structure Keccak
