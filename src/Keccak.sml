@@ -256,7 +256,6 @@ struct
       val w = State.w (Arr.toState A)
       val timer = Measure.start ()
       (* step 1. *)
-      val A' = Arr.clone A
       (* step 2. *)
       val RC = BitArray.array w
     in
@@ -267,12 +266,9 @@ struct
       Measure.check "Iota: step3:" timer;
       (* step 4. *)
       for 0 (fn z => z < w) inc (fn z =>
-        Arr.update (A', 0, 0, z,
-          Bit.xor (Arr.sub (A', 0, 0, z),
-                   BitArray.sub (RC, z)))
+        Arr.update (A, 0, 0, z,
+          Bit.xor (Arr.sub (A, 0, 0, z), BitArray.sub (RC, z)))
       );
-      BitArray.copy { src = State.toArray (Arr.toState A')
-                    , dst = State.toArray (Arr.toState A ) }
       Measure.check "Iota: step4:" timer
     end
 
