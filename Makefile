@@ -3,13 +3,15 @@ SML           ?= sml
 # -32 or -64
 # empty is default
 SML_BITMODE   ?=
-SML_FLAGS     ?= $(SML_BITMODE)
-HEAP_SUFFIX   ?= $(shell $(SML) $(SML_FLAGS) @SMLsuffix)
+SML_FLAGS     ?=
+HEAP_SUFFIX   ?= $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
 
 SMLDOC        ?= smldoc
 
 MLBUILD       ?= ml-build
-MLBUILD_FLAGS ?= $(SML_BITMODE)
+MLBUILD_FLAGS ?=
+
+SML_DULIST    ?=
 
 DOCDIR        ?= doc
 
@@ -37,12 +39,12 @@ doc: sources.cm $(SRC)
 
 
 $(TEST_TARGET): $(TEST_SRC)
-	$(MLBUILD) $(MLBUILD_FLAGS) test/sources.cm Sha3Test.main $@
+	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) test/sources.cm Sha3Test.main $@
 
 
 .PHONY: test
 test: $(TEST_TARGET)
-	@$(SML) $(SML_FLAGS) @SMLload=$<
+	@$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$<
 
 
 .PHONY: clean
