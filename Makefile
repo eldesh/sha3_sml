@@ -16,25 +16,32 @@ MLDEPENDS_FLAGS ?= -n
 
 SML_DULIST    ?=
 
-DOCDIR        ?= doc
+PREFIX        ?= /usr/local/sml
+PATHCONFIG    ?= $(HOME)/.smlnj-pathconfig
+LIBDIR        ?= $(PREFIX)/lib/libsha3sml.cm
+DOCDIR        ?= $(PREFIX)/doc/libsha3sml
 
 SRC           := $(wildcard src/*)
 TEST_SRC      := $(wildcard test/*)
 
 TEST_TARGET   ?= bin/Sha3Test.$(HEAP_SUFFIX)
 
-all: libsha3sml test doc
+all: libsha3sml-nodoc
+
+
+.PHONY: libsha3sml-nodoc
+libsha3sml-nodoc: .cm/$(HEAP_SUFFIX)
 
 
 .PHONY: libsha3sml
-libsha3sml: .cm/$(HEAP_SUFFIX)
+libsha3sml: .cm/$(HEAP_SUFFIX) doc
 
 
 .cm/$(HEAP_SUFFIX):
-	echo 'CM.stabilize true "sources.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
+	echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
 
 
-libsha3sml.d: sources.cm src/sources.cm
+libsha3sml.d: libsha3sml.cm src/sources.cm
 	@touch $@
 	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< .cm/$(HEAP_SUFFIX)
 	@sed -i -e "s|^[^#]\([^:]\+\):|\1 $@:|" $@
@@ -45,10 +52,24 @@ ifeq (,$(findstring $(MAKECMDGOALS),clean))
 endif
 
 
-.PHONY: doc
-doc: sources.cm $(SRC)
-	$(RM) -r $(DOCDIR)
-	mkdir $(DOCDIR)
+.PHONY: install-nodoc
+install-nodoc: libsha3sml
+	@if grep libsha3sml.cm $(PATHCONFIG) >/dev/null 2>&1; then \
+		echo "libsha3sml.cm is already installed to $(PATHCONFIG)" >&2 ; \
+		exit 1 ; \
+	fi
+	install -d $(LIBDIR)
+	cp -R .cm $(LIBDIR)/.cm
+	echo "libsha3sml.cm $(LIBDIR)" >> $(PATHCONFIG)
+
+
+.PHONY: install
+install: install-nodoc install-doc
+
+
+doc: libsha3sml
+	$(RM) -r doc
+	mkdir doc
 	$(SMLDOC) -c UTF-8 \
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
@@ -56,8 +77,13 @@ doc: sources.cm $(SRC)
 		--hidebysig \
 		--recursive \
 		--linksource \
-		-d $(DOCDIR) \
+		-d doc \
 		sources.cm
+
+
+.PHONY: install-doc
+install-doc: doc
+	cp -R doc $(DOCDIR)
 
 
 $(TEST_TARGET): $(TEST_SRC)
@@ -72,7 +98,7 @@ test: $(TEST_TARGET)
 .PHONY: clean
 clean:
 	-$(RM) libsha3sml.d
-	-$(RM) -r $(DOCDIR)
+	-$(RM) -r doc
 	-$(RM) $(TEST_TARGET)
 	-$(RM) -r .cm
 	-$(RM) -r src/.cm
