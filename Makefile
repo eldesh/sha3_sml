@@ -37,10 +37,12 @@ libsha3sml: .cm/$(HEAP_SUFFIX) doc
 
 
 .cm/$(HEAP_SUFFIX):
+	@echo "  [SMLNJ] $@"
 	@echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
 
 
 libsha3sml.d: libsha3sml.cm src/sources.cm
+	@echo "  [GEN] $@"
 	@touch $@
 	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< .cm/$(HEAP_SUFFIX)
 	@sed -i -e "s|^[^#]\([^:]\+\):|\1 $@:|" $@
@@ -71,6 +73,7 @@ install: install-nodoc install-doc
 
 .PHONY: doc
 doc:
+	@echo "  [SMLDoc] $@"
 	@$(RM) -r doc
 	@mkdir doc
 	@$(SMLDOC) -c UTF-8 \
@@ -102,6 +105,11 @@ $(TEST_TARGET): $(TEST_SRC)
 .PHONY: test
 test: $(TEST_TARGET)
 	@$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$<
+
+
+.PHONY: test-ignored
+test-ignored: $(TEST_TARGET)
+	@$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$< --ignored
 
 
 .PHONY: clean
