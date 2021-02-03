@@ -32,17 +32,24 @@ When you generate documents of Sha3SML, [SMLDoc] is also required.
 
 ## Build
 
-To build this library, just run the `make` command.
+To build this library and generates docs using [SMLDoc], specify the target `libsha3sml`.
+
+```sh
+$ make libsha3sml
+```
+
+To build `libsha3sml` without docs, just run the `make` command.
 
 ```sh
 $ make
 ```
 
-To build `libsha3sml` without using [SMLDoc], specify the target `libsha3sml-nodoc`.
+Or specify the target `libsha3sml-nodoc`.
 
 ```sh
 $ make libsha3sml-nodoc
 ```
+
 
 ## Install
 
@@ -73,11 +80,17 @@ $ make doc
 To run unit tests, run the `test` target.
 This target additionally requires [SMLUnit].
 
-
 ```sh
 $ make test
 ```
 
+In addition, if you want to test this library thoroughly, run the test-ignored target.
+This target will test the generation of 100,000 digests.
+This test will take several hours to run.
+
+```sh
+$ make test-ignored
+```
 
 
 [SML/NJ]: https://www.smlnj.org/ "Standard ML of New Jersey"
