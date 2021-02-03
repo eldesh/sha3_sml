@@ -95,6 +95,7 @@ install-doc: doc
 
 
 $(TEST_TARGET): $(TEST_SRC)
+	@mkdir -p bin
 	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) test/sources.cm Sha3Test.main $@
 
 
