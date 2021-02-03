@@ -17,9 +17,8 @@ MLDEPENDS_FLAGS ?= -n
 SML_DULIST    ?=
 
 PREFIX        ?= /usr/local/sml
-PATHCONFIG    ?= $(HOME)/.smlnj-pathconfig
-LIBDIR        ?= $(PREFIX)/lib/libsha3sml.cm
-DOCDIR        ?= $(PREFIX)/doc/libsha3sml
+LIBDIR        ?= lib/libsha3sml.cm
+DOCDIR        ?= doc/libsha3sml
 
 SRC           := $(wildcard src/*)
 TEST_SRC      := $(wildcard test/*)
@@ -38,7 +37,7 @@ libsha3sml: .cm/$(HEAP_SUFFIX) doc
 
 
 .cm/$(HEAP_SUFFIX):
-	echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
+	@echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
 
 
 libsha3sml.d: libsha3sml.cm src/sources.cm
@@ -53,24 +52,28 @@ endif
 
 
 .PHONY: install-nodoc
-install-nodoc: libsha3sml
-	@if grep libsha3sml.cm $(PATHCONFIG) >/dev/null 2>&1; then \
-		echo "libsha3sml.cm is already installed to $(PATHCONFIG)" >&2 ; \
-		exit 1 ; \
-	fi
-	install -d $(LIBDIR)
-	cp -R .cm $(LIBDIR)/.cm
-	echo "libsha3sml.cm $(LIBDIR)" >> $(PATHCONFIG)
+install-nodoc: libsha3sml-nodoc
+	@install -d $(PREFIX)/$(LIBDIR)
+	@cp -R .cm $(PREFIX)/$(LIBDIR)/.cm
+	@echo "================================================================"
+	@echo "libsha3sml has been installed to:"
+	@echo "\t$(PREFIX)/$(LIBDIR)"
+	@echo "Add an entry to the file ~/.smlnj-pathconfig such like:"
+	@echo "\tlibsha3sml.cm $(PREFIX)/libsha3sml.cm"
+	@echo "Then you can load the library like"
+	@echo "\t\"CM.make \"$$/libsha3sml.cm\";\"."
+	@echo "================================================================"
 
 
 .PHONY: install
 install: install-nodoc install-doc
 
 
-doc: libsha3sml
-	$(RM) -r doc
-	mkdir doc
-	$(SMLDOC) -c UTF-8 \
+.PHONY: doc
+doc:
+	@$(RM) -r doc
+	@mkdir doc
+	@$(SMLDOC) -c UTF-8 \
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
 		--builtinstructure=VectorSlice \
@@ -78,12 +81,17 @@ doc: libsha3sml
 		--recursive \
 		--linksource \
 		-d doc \
-		sources.cm
+		libsha3sml.cm
 
 
 .PHONY: install-doc
 install-doc: doc
-	cp -R doc $(DOCDIR)
+	@install -d $(PREFIX)/$(DOCDIR)
+	@cp -prT doc $(PREFIX)/$(DOCDIR)
+	@echo "================================================================"
+	@echo "Generated API Documents of Sha3SML"
+	@echo "\t$(PREFIX)/$(DOCDIR)"
+	@echo "================================================================"
 
 
 $(TEST_TARGET): $(TEST_SRC)
