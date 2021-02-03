@@ -196,25 +196,38 @@ struct
    * Tests for SHA3 Validation System Test Vectors
    * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
    *
+   * @params ignored
+   * @param ignored Whether or not to run very heavy tests of
+   *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs () =
+  fun test_sha3vs ignored =
     $("test_sha3vs",
-      &[ short_messages_test (),
-         long_messages_test (),
-         pseudorandomly_generated_messages_test ()
-       ])
+      let
+        val test_cases =
+          short_messages_test () :: (
+          if ignored
+          then [ long_messages_test ()
+               , pseudorandomly_generated_messages_test ()
+               ]
+          else [ ])
+      in
+        &test_cases
+      end)
 
-  fun test () =
+  fun test ignored =
     $("test",
       &[ test_example_values (),
-         test_sha3vs ()
+         test_sha3vs ignored
        ])
 
-  fun main (_, _) =
-    (TextUITestRunner.runTest {output=TextIO.stdOut} (test());
-     TextIO.flushOut TextIO.stdOut;
-     OS.Process.success
-     )
+  fun main (_, args) =
+  let
+    val ignored = List.exists (fn a => a = "--ignored") args
+  in
+    TextUITestRunner.runTest {output=TextIO.stdOut} (test ignored);
+    TextIO.flushOut TextIO.stdOut;
+    OS.Process.success
+  end
 end
 
