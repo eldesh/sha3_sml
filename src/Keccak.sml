@@ -497,6 +497,50 @@ struct
   fun sha3_512 M =
     keccak 1024 (M || `[Bit.O, Bit.I]) 512
 
+  (**
+   * SHAKE128
+   * SHAKE128 is defined in `6.2 SHA-3 Extendable-Output Functions`.
+   * This function is also called `SHA-3 XOF`.
+   *
+   * @params M d
+   * @param M A given message.
+   * @param d output length
+   *)
+  fun shake128 M d =
+    raw_shake128 (M || `[Bit.I, Bit.I]) d
+
+  (**
+   * SHAKE256
+   * SHAKE256 is defined in `6.2 SHA-3 Extendable-Output Functions`.
+   * This function is also called `SHA-3 XOF`.
+   *
+   * @params M d
+   * @param M A given message.
+   * @param d output length
+   *)
+  and shake256 M d =
+    raw_shake256 (M || `[Bit.I, Bit.I]) d
+
+  (**
+   * RawSHAKE128
+   *
+   * @params J d
+   * @param J A given message.
+   * @param d output length
+   *)
+  and raw_shake128 J d =
+    keccak 256 (J || `[Bit.I, Bit.I]) d
+
+  (**
+   * RawSHAKE256
+   *
+   * @params J d
+   * @param J A given message.
+   * @param d output length
+   *)
+  and raw_shake256 J d =
+    keccak 512 (J || `[Bit.I, Bit.I]) d
+
   end (* local *)
 
 end
