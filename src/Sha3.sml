@@ -57,6 +57,8 @@ struct
        | Sha3_256 => Keccak.sha3_256
        | Sha3_384 => Keccak.sha3_384
        | Sha3_512 => Keccak.sha3_512
+       | Shake128 d => (fn M => Keccak.shake128 M d)
+       | Shake256 d => (fn M => Keccak.shake256 M d)
 
   fun hashString kind m =
     let
