@@ -84,7 +84,7 @@ This target additionally requires [SMLUnit].
 $ make test
 ```
 
-In addition, if you want to test this library thoroughly, run the test-ignored target.
+In addition, if you want to test this library thoroughly, run the `test-ignored` target.
 This target will test the generation of 100,000 digests.
 This test will take several hours to run.
 
@@ -98,7 +98,6 @@ $ make test-ignored
 [SMLDoc]: https://www.pllab.riec.tohoku.ac.jp/smlsharp//?SMLDoc "SMLDoc"
 
 [SMLUnit]: https://github.com/smlsharp/SMLUnit "SMLUnit"
-
 
 [FIPS202]: https://doi.org/10.6028/NIST.FIPS.202 "SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions"
 
