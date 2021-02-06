@@ -131,8 +131,12 @@ struct
     fun read_test_case path =
       let val (kind, cases) = Sha3VS.parse path in
         $(OS.Path.file path,
-            &(map (fn {msg, digest} =>
-                     %(fn()=> assert_eq (`digest) (hash kind msg)))
+            &(map (fn C as {msg, digest} =>
+                    (
+                    (* print (Sha3VS.Case.toString C); *)
+                     %(fn()=> assert_eq (`digest) (hash kind msg))
+                    )
+                  )
                 cases))
       end
   in

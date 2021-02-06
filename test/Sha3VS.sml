@@ -6,6 +6,10 @@ struct
 
   structure Case = struct
     type t = { msg: Word8.word vector * int, digest: string }
+    fun toString { msg as (v,i), digest } =
+      let val ws = concat(Vector.foldl (fn (w,ws)=> Word8.toString w::ws) [] v) in
+        String.concatWith " " ["Len:", Int.toString i, "MD:", digest, "MSG:", ws, "\n"]
+      end
   end
 
   structure MonteCase = struct
