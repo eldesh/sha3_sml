@@ -21,7 +21,7 @@ Sha3SML implements a part of the functions.
 
 ✔ empty input is supported
 ✔ byte oriented input is supported
-✗ bit oriented input is unsupported
+✔ bit oriented input is supported
 
 
 ## Environments
