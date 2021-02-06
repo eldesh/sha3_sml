@@ -8,7 +8,7 @@ SHA3 is a cryptographic hash algorithm standard defined as [FIPS202].
 ## Supported functions
 
 SHA3 standard declares some hash function variations.
-Sha3SML implements a part of the functions.
+Sha3SML supports all variations and options.
 
 |Hash Function|Supported |
 |:------------|:--------:|
@@ -16,8 +16,8 @@ Sha3SML implements a part of the functions.
 |SHA3-256     |  ✔       |
 |SHA3-384     |  ✔       |
 |SHA3-512     |  ✔       |
-|SHAKE-128    |  ✗       |
-|SHAKE-256    |  ✗       |
+|SHAKE-128    |  ✔       |
+|SHAKE-256    |  ✔       |
 
 - ✔ empty input is supported
 - ✔ byte oriented input is supported
