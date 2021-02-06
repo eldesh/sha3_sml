@@ -112,9 +112,15 @@ struct
     in SS.string l
     end
 
+  (* round-up dividing *)
+  infix 7 div'
+  fun m div' d =
+    let val r = if m mod d <> 0 then 1 else 0
+    in m div d + r end
+
   fun scan_msg len r s =
     bind (satisfy2_scan (S.isPrefix "Msg = ")
-                        (fn x => S.extract (x, 6, SOME (len div 8 * 2))) r s)
+                        (fn x => S.extract (x, 6, SOME (len div' 8 * 2))) r s)
                         (fn (msg_line, s) =>
     let
       val msgs = split 2 (trimr msg_line)
