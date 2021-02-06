@@ -20,8 +20,7 @@ PREFIX        ?= /usr/local/sml
 LIBDIR        ?= lib/libsha3sml.cm
 DOCDIR        ?= doc/libsha3sml
 
-SRC           := $(wildcard src/*)
-TEST_SRC      := $(wildcard test/*)
+DEPENDS       := libsha3sml.d test/sources.d
 
 TEST_TARGET   ?= bin/Sha3Test.$(HEAP_SUFFIX)
 
@@ -36,22 +35,24 @@ libsha3sml-nodoc: .cm/$(HEAP_SUFFIX)
 libsha3sml: .cm/$(HEAP_SUFFIX) doc
 
 
-.cm/$(HEAP_SUFFIX):
+.cm/$(HEAP_SUFFIX): libsha3sml.d libsha3sml.cm
 	@echo "  [SMLNJ] $@"
 	@echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
 
 
-libsha3sml.d: libsha3sml.cm src/sources.cm
+$(DEPENDS): %.d: %.cm
 	@echo "  [GEN] $@"
 	@touch $@
-	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< .cm/$(HEAP_SUFFIX)
-	@sed -i -e "s|^[^#]\([^:]\+\):|\1 $@:|" $@
-
+	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(HEAP_SUFFIX)
+	@sed -i -e "s|^\([^#][^:]\+\):|\1 $@:|" $@
 
 ifeq (,$(findstring $(MAKECMDGOALS),clean))
   include libsha3sml.d
 endif
 
+ifeq ($(MAKECMDGOALS),test)
+  include test/sources.d
+endif
 
 .PHONY: install-nodoc
 install-nodoc: libsha3sml-nodoc
@@ -97,7 +98,7 @@ install-doc: doc
 	@echo "================================================================"
 
 
-$(TEST_TARGET): $(TEST_SRC)
+$(TEST_TARGET): libsha3sml-nodoc test/sources.cm
 	@mkdir -p bin
 	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) test/sources.cm Sha3Test.main $@
 
@@ -114,7 +115,7 @@ test-ignored: $(TEST_TARGET)
 
 .PHONY: clean
 clean:
-	-$(RM) libsha3sml.d
+	-$(RM) $(DEPENDS)
 	-$(RM) -r doc
 	-$(RM) $(TEST_TARGET)
 	-$(RM) -r .cm
