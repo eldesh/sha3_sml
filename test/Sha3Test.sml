@@ -136,7 +136,7 @@ struct
                 cases))
       end
   in
-  fun short_messages_test () =
+  fun short_messages_test_byte () =
     $("ShortMessagesTest",
       &(map read_test_case
           [ "test/sha3_bytetestvectors/SHA3_224ShortMsg.rsp"
@@ -145,7 +145,7 @@ struct
           , "test/sha3_bytetestvectors/SHA3_512ShortMsg.rsp"
           ]))
 
-  fun long_messages_test () =
+  fun long_messages_test_byte () =
     $("LongMessagesTest",
       &(map read_test_case
           [ "test/sha3_bytetestvectors/SHA3_224LongMsg.rsp"
@@ -153,6 +153,25 @@ struct
           , "test/sha3_bytetestvectors/SHA3_384LongMsg.rsp"
           , "test/sha3_bytetestvectors/SHA3_512LongMsg.rsp"
           ]))
+
+  fun short_messages_test_bit () =
+    $("ShortMessagesTest",
+      &(map read_test_case
+          [ "test/sha3_bittestvectors/SHA3_224ShortMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_256ShortMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_384ShortMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_512ShortMsg.rsp"
+          ]))
+
+  fun long_messages_test_bit () =
+    $("LongMessagesTest",
+      &(map read_test_case
+          [ "test/sha3_bittestvectors/SHA3_224LongMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_256LongMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_384LongMsg.rsp"
+          , "test/sha3_bittestvectors/SHA3_512LongMsg.rsp"
+          ]))
+
   end (* local *)
 
   local
@@ -182,7 +201,7 @@ struct
                 cases)))
       end
   in
-  fun pseudorandomly_generated_messages_test () =
+  fun pseudorandomly_generated_messages_test_byte () =
     $("PseudorandomlyGeneratedMessagesTest",
       &(map read_test_monte
           [ "test/sha3_bytetestvectors/SHA3_224Monte.rsp"
@@ -190,10 +209,20 @@ struct
           , "test/sha3_bytetestvectors/SHA3_384Monte.rsp"
           , "test/sha3_bytetestvectors/SHA3_512Monte.rsp"
           ]))
+
+  fun pseudorandomly_generated_messages_test_bit () =
+    $("PseudorandomlyGeneratedMessagesTest",
+      &(map read_test_monte
+          [ "test/sha3_bittestvectors/SHA3_224Monte.rsp"
+          , "test/sha3_bittestvectors/SHA3_256Monte.rsp"
+          , "test/sha3_bittestvectors/SHA3_384Monte.rsp"
+          , "test/sha3_bittestvectors/SHA3_512Monte.rsp"
+          ]))
+
   end (* local *)
 
   (**
-   * Tests for SHA3 Validation System Test Vectors
+   * Tests for SHA3 Validation System Test Vectors (for Byte-Oriented Messages)
    * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
    *
    * @params ignored
@@ -201,14 +230,37 @@ struct
    *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs ignored =
-    $("test_sha3vs",
+  fun test_sha3vs_byte ignored =
+    $("sha3vs(byte)",
       let
         val test_cases =
-          short_messages_test () :: (
+          short_messages_test_byte () :: (
           if ignored
-          then [ long_messages_test ()
-               , pseudorandomly_generated_messages_test ()
+          then [ long_messages_test_byte ()
+               , pseudorandomly_generated_messages_test_byte ()
+               ]
+          else [ ])
+      in
+        &test_cases
+      end)
+
+  (**
+   * Tests for SHA3 Validation System Test Vectors (for Bit-Oriented Messages)
+   * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
+   *
+   * @params ignored
+   * @param ignored Whether or not to run very heavy tests of
+   *        The Pseudorandomly Generated Messages Test.
+   * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
+   *)
+  fun test_sha3vs_bit ignored =
+    $("sha3vs(bit)",
+      let
+        val test_cases =
+          short_messages_test_bit () :: (
+          if ignored
+          then [ long_messages_test_bit ()
+               , pseudorandomly_generated_messages_test_bit ()
                ]
           else [ ])
       in
@@ -218,7 +270,8 @@ struct
   fun test ignored =
     $("test",
       &[ test_example_values (),
-         test_sha3vs ignored
+         test_sha3vs_byte ignored,
+         test_sha3vs_bit ignored
        ])
 
   fun main (_, args) =
