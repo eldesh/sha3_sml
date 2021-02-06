@@ -14,7 +14,7 @@ sig
   val fromHexString : string -> t
 
   (**
-   * Convert to string
+   * Convert to hexadecimal string
    *)
   val toString : t -> string
 

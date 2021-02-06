@@ -7,6 +7,12 @@ struct
 
   exception InvalidSizeState of State.t
 
+  (** assertion error *)
+  exception Assert of string
+
+  fun assert p msg =
+    if p () then () else raise Assert msg
+
   infix 4 ||
   val op|| = BitArray.||
 
@@ -322,10 +328,10 @@ struct
    * And the permutation is defined for any b in {25, 50, 100, 200, 400, 800, 1600} and any positive integer nr.
    * </p>
    *
-   * @params b nr S
+   * @params b S nr
    * @param b  length of string S.
    * @param S  string S of length b.
-   * @param nr number of rounds nr.
+   * @param nr number of rounds.
    * @return S' of length b.
    *)
   fun keccak_p b nr S =
@@ -358,10 +364,11 @@ struct
    * Algorithm 8: SPONGE[f, pad, r](N, d)
    *
    * @params f pad r N d
-   * @param f mapping function for strings of fixed length b.
-   * @param pad
-   * @param r rate (1600-c(bits)).
-   * @param N string N.
+   * @param f mapping function for strings of fixed length b. b is called width.
+   * @param pad A function that produces padding.
+   *            forall x>0, m>=0, exists d, m + len(pad x m) = d * m.
+   * @param r rate parameter of the sponge construction.
+   * @param N The input string.
    * @param d nonnegative integer.
    *          determines the number of bits that this function returns.
    * @return string Z such that len(Z) = d.
@@ -370,13 +377,15 @@ struct
     let
       val () = if !debug then (print "sponge:\n"; BitArray.dump (TextIO.stdOut, N))
                else ()
+      val int = Int.toString
+      val () = assert (fn()=> r < b) ("violates [r < b] with "^int r^" and "^int b)
       val len = B.length
       val timer = Measure.start ()
       (* step 1. *)
       val P = N || (pad r (len N))
       (* step 2. *)
       val n = len P div r
-      (* step 3. *)
+      (* step 3. the _capacity_ *)
       val c = b - r
       (* step 4. *)
       val Pn = Vector.tabulate (n, fn i => B.range (P, i*r, r))
