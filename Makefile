@@ -57,12 +57,12 @@ endif
 .PHONY: install-nodoc
 install-nodoc: libsha3sml-nodoc
 	@install -d $(PREFIX)/$(LIBDIR)
-	@cp -R .cm $(PREFIX)/$(LIBDIR)/.cm
+	@cp -R .cm $(PREFIX)/$(LIBDIR)/
 	@echo "================================================================"
 	@echo "libsha3sml has been installed to:"
 	@echo "\t$(PREFIX)/$(LIBDIR)"
 	@echo "Add an entry to your pathconfig (e.g. ~/.smlnj-pathconfig) such like:"
-	@echo "\tlibsha3sml.cm $(PREFIX)/libsha3sml.cm"
+	@echo "\tlibsha3sml.cm $(PREFIX)/$(LIBDIR)"
 	@echo "Then you can load the library like"
 	@echo "\t\"CM.make \"$$/libsha3sml.cm\";\"."
 	@echo "================================================================"
