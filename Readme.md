@@ -65,6 +65,44 @@ or without doc:
 $ make install-nodoc [PREFIX=/path/to/install]
 ```
 
+These targets will instruct you to add an entry to your _PATHCONFIG_ file.
+
+```sh
+$ echo 'libsha3sml.cm /path/to/install/libsha3sml.cm' >> ~/.smlnj-pathconfig
+```
+
+
+## How to use
+
+### Use from other projects
+
+After installation, Sha3SML can be referenced from other projects as `$/sha3sml.cm` like:
+
+```
+(* sources.cm *)
+group
+is
+  $/basis.cm
+  $/sha3sml.cm
+  main.sml
+```
+
+### Load to the interactive environment
+
+Users also can load Sha3SML into the interactive environment:
+
+```sh
+$ sml
+- CM.make "$/libsha3sml.cm";
+(* ... snip ... *)
+val it = true : bool
+- Sha3.hashString Sha3Kind.Sha3_256 "";
+val it = - : Sha3.t
+- Sha3.toString it;
+val it = "A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A" :
+  string
+```
+
 
 ## Document
 
