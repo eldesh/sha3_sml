@@ -61,7 +61,7 @@ install-nodoc: libsha3sml-nodoc
 	@echo "================================================================"
 	@echo "libsha3sml has been installed to:"
 	@echo "\t$(PREFIX)/$(LIBDIR)"
-	@echo "Add an entry to the file ~/.smlnj-pathconfig such like:"
+	@echo "Add an entry to your pathconfig (e.g. ~/.smlnj-pathconfig) such like:"
 	@echo "\tlibsha3sml.cm $(PREFIX)/libsha3sml.cm"
 	@echo "Then you can load the library like"
 	@echo "\t\"CM.make \"$$/libsha3sml.cm\";\"."
