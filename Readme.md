@@ -2,7 +2,7 @@
 # SHA3SML
 
 Sha3SML (which is abbreviated for [SHA3 - StandardML]) is a SHA3 algorithm implementation with pure StandardML.
-SHA3 is a cryptographic hash algorithm defined as [FIPS202].
+SHA3 is a cryptographic hash algorithm standard defined as [FIPS202].
 
 
 ## Supported functions
@@ -115,15 +115,17 @@ $ make doc
 
 ## Test
 
+Sha3SML is validated using a number of test cases consisting of examples with intermediate values provided in [Cryptographic Standards and Guidelines][EXVALS] and test vectors provided in [Cryptographic Algorithm Validation Program][CAVP].
+
 To run unit tests, run the `test` target.
-This target additionally requires [SMLUnit].
+To run this target, [SMLUnit] is required.
 
 ```sh
 $ make test
 ```
 
-In addition, if you want to test this library thoroughly, run the `test-ignored` target.
-This target will test the generation of 100,000 digests.
+Additionally, if you want to test this library thoroughly, run the `test-ignored` target.
+This target will test the generation of over 100,000 digests in addition to a large number of test cases.
 This test will take several hours to run.
 
 ```sh
@@ -139,4 +141,6 @@ $ make test-ignored
 
 [FIPS202]: https://doi.org/10.6028/NIST.FIPS.202 "SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions"
 
-[SHA3VS]: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/sha3/sha3vs.pdf "Secure Hash Algorithm-3 Validation System (SHA3VS)"
+[EXVALS]: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values "Cryptographic Standards and Guidelines"
+
+[CAVP]: https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing "Cryptographic Algorithm Validation Program"
