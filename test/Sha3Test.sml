@@ -179,6 +179,34 @@ struct
   end (* local *)
 
   local
+    fun hash kind = Sha3.hashVector kind
+    fun bit2shake 128 = Sha3Kind.Shake128
+      | bit2shake 256 = Sha3Kind.Shake256
+    fun read_test_case (bit, path) =
+      let
+        val (outlen, cases) = Sha3VS.parse_xof path
+      in
+        $(OS.Path.file path,
+            &(map (fn C as {len, msg, output} =>
+                    (
+                     (* print (Sha3VS.ShakeCase.toString C); *)
+                     %(fn()=> assert_eq (`output) (hash (bit2shake bit outlen) (msg, len mod 8)))
+                    )
+                  )
+                cases))
+      end
+  in
+
+  fun short_messages_xof_test_byte () =
+    $("ShortMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bytetestvectors/SHAKE128ShortMsg.rsp")
+          , (256, "test/shake_bytetestvectors/SHAKE256ShortMsg.rsp")
+          ]))
+
+  end (* local *)
+
+  local
     fun rep f n x =
       let
         fun go i e =
@@ -273,7 +301,7 @@ struct
 
   fun test_sha3vs_xof_byte ignored =
     $("sha3vs XOF byte",
-     &[])
+      &[ short_messages_xof_test_byte () ])
 
   fun test_sha3vs_xof_bit ignored =
     $("sha3vs XOF bit",
