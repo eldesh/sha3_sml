@@ -204,6 +204,28 @@ struct
           , (256, "test/shake_bytetestvectors/SHAKE256ShortMsg.rsp")
           ]))
 
+  fun long_messages_xof_test_byte () =
+    $("LongMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bytetestvectors/SHAKE128LongMsg.rsp")
+          , (256, "test/shake_bytetestvectors/SHAKE256LongMsg.rsp")
+          ]))
+
+  fun short_messages_xof_test_bit () =
+    $("ShortMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bittestvectors/SHAKE128ShortMsg.rsp")
+          , (256, "test/shake_bittestvectors/SHAKE256ShortMsg.rsp")
+          ]))
+
+  fun long_messages_xof_test_bit () =
+    $("LongMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bittestvectors/SHAKE128LongMsg.rsp")
+          , (256, "test/shake_bittestvectors/SHAKE256LongMsg.rsp")
+          ]))
+
+
   end (* local *)
 
   local
@@ -301,11 +323,15 @@ struct
 
   fun test_sha3vs_xof_byte ignored =
     $("sha3vs XOF byte",
-      &[ short_messages_xof_test_byte () ])
+      &[ short_messages_xof_test_byte ()
+       , long_messages_xof_test_byte ()
+       ])
 
   fun test_sha3vs_xof_bit ignored =
     $("sha3vs XOF bit",
-     &[])
+      &[ short_messages_xof_test_bit ()
+       , long_messages_xof_test_bit ()
+       ])
 
   fun test ignored =
     $("test",
