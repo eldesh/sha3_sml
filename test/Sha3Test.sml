@@ -356,17 +356,25 @@ struct
 
   fun test_sha3vs_xof_byte ignored =
     $("sha3vs XOF byte",
-      &[ short_messages_xof_test_byte ()
-       , long_messages_xof_test_byte ()
-       , variable_messages_xof_test_byte ()
-       ])
+      let
+        val long = if ignored then
+                     [ long_messages_xof_test_byte ()
+                     , variable_messages_xof_test_byte () ]
+                   else []
+      in
+        &(short_messages_xof_test_byte () :: long)
+      end)
 
   fun test_sha3vs_xof_bit ignored =
     $("sha3vs XOF bit",
-      &[ short_messages_xof_test_bit ()
-       , long_messages_xof_test_bit ()
-       , variable_messages_xof_test_bit ()
-       ])
+      let
+        val long = if ignored then
+                     [ long_messages_xof_test_bit ()
+                     , variable_messages_xof_test_bit () ]
+                   else []
+      in
+        &(short_messages_xof_test_bit () :: long)
+      end)
 
   fun test ignored =
     $("test",
