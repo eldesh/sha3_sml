@@ -165,6 +165,10 @@ struct
       f file handle e => (TextIO.closeIn file; raise e)
     end
 
+  fun expect msg p =
+    if p () then ()
+    else raise Fail msg
+
   (**
    * parse Short and Long Messages file
    *)
@@ -180,9 +184,9 @@ struct
         bind (scan_kind       line strm)     (fn (kind, strm) =>
         bind (list tt (scan_case line) strm) (fn (  cs, strm) =>
         bind (skip_blank_line line strm)     (fn (   _, strm) =>
-        if IO.endOfStream strm
-        then SOME (kind, cs)
-        else NONE)))))
+        (expect "endOfStream" (fn()=> IO.endOfStream strm);
+         SOME (kind, cs)
+        ))))))
     in
       (kind, cases)
     end)
@@ -206,9 +210,9 @@ struct
         bind (scan_seed       line strm)      (fn (seed, strm) =>
         bind (list tt (scan_mcase line) strm) (fn (  cs, strm) =>
         bind (skip_blank_line line strm)      (fn (   _, strm) =>
-        if IO.endOfStream strm
-        then SOME (kind, seed, cs)
-        else NONE)))))))
+        (expect "endOfStream" (fn()=> IO.endOfStream strm);
+         SOME (kind, seed, cs)
+         ))))))))
     in
       (kind, seed, cases)
     end)
