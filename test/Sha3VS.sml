@@ -8,7 +8,11 @@ struct
     type t = { msg: Word8.word vector * int, digest: string }
     fun toString { msg as (v,i), digest } =
       let val ws = concat(Vector.foldl (fn (w,ws)=> Word8.toString w::ws) [] v) in
-        String.concatWith " " ["Len:", Int.toString i, "MD:", digest, "MSG:", ws, "\n"]
+        String.concatWith " " [
+          "Len:", Int.toString i,
+          "MD:", digest,
+          "MSG:", ws
+        ]
       end
   end
 
@@ -23,8 +27,7 @@ struct
         String.concatWith " " [
           "Len:", Int.toString len,
           "Msg:", ws,
-          "Output:", output,
-          "\n"
+          "Output:", output
         ]
       end
   end
@@ -44,8 +47,7 @@ struct
           "Outputlen:", int (outlen kind),
           "Msg:", ws,
           "Output:", output,
-          "Kind:", Sha3Kind.toString kind,
-          "\n"
+          "Kind:", Sha3Kind.toString kind
         ]
       end
   end

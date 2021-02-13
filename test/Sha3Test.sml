@@ -128,12 +128,13 @@ struct
 
   local
     fun hash kind = Sha3.hashVector kind
+    fun println s = (print s; print "\n")
     fun read_test_case path =
       let val (kind, cases) = Sha3VS.parse path in
         $(OS.Path.file path,
             &(map (fn C as {msg, digest} =>
                     (
-                    (* print (Sha3VS.Case.toString C); *)
+                    (* println (Sha3VS.Case.toString C); *)
                      %(fn()=> assert_eq (`digest) (hash kind msg))
                     )
                   )
@@ -182,6 +183,7 @@ struct
     fun hash kind = Sha3.hashVector kind
     fun bit2shake 128 = Sha3Kind.Shake128
       | bit2shake 256 = Sha3Kind.Shake256
+    fun println s = (print s; print "\n")
     fun read_test_case (bit, path) =
       let
         val (outlen, cases) = Sha3VS.parse_xof path
@@ -189,7 +191,7 @@ struct
         $(OS.Path.file path,
             &(map (fn C as {len, msg, output} =>
                     (
-                     (* print (Sha3VS.ShakeCase.toString C); *)
+                     (* println (Sha3VS.ShakeCase.toString C); *)
                      %(fn()=> assert_eq (`output) (hash (bit2shake bit outlen) (msg, len mod 8)))
                     )
                   )
@@ -277,12 +279,13 @@ struct
 
   local
     fun hash kind = Sha3.hashVector kind
+    fun println s = (print s; print "\n")
     fun read_test_case path =
       let val cases = Sha3VS.parse_xof_variable path in
         $(OS.Path.file path,
             &(map (fn C as {count, kind, msg, output} =>
                     (
-                     (* print (Sha3VS.VariableOutCase.toString C); *)
+                     (* println (Sha3VS.VariableOutCase.toString C); *)
                      %(fn()=> assert_eq (`output) (hash kind (msg, 0)))
                     )
                   )
