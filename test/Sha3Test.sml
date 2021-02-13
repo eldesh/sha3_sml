@@ -275,6 +275,36 @@ struct
 
   end (* local *)
 
+  local
+    fun hash kind = Sha3.hashVector kind
+    fun read_test_case path =
+      let val cases = Sha3VS.parse_xof_variable path in
+        $(OS.Path.file path,
+            &(map (fn C as {count, kind, msg, output} =>
+                    (
+                     (* print (Sha3VS.VariableOutCase.toString C); *)
+                     %(fn()=> assert_eq (`output) (hash kind (msg, 0)))
+                    )
+                  )
+                cases))
+      end
+  in
+  fun variable_messages_xof_test_byte () =
+    $("VariableMessagesXOFTest",
+      &(map read_test_case
+          [ "test/shake_bytetestvectors/SHAKE128VariableOut.rsp"
+          , "test/shake_bytetestvectors/SHAKE256VariableOut.rsp"
+          ]))
+
+  fun variable_messages_xof_test_bit () =
+    $("VariableMessagesXOFTest",
+      &(map read_test_case
+          [ "test/shake_bittestvectors/SHAKE128VariableOut.rsp"
+          , "test/shake_bittestvectors/SHAKE256VariableOut.rsp"
+          ]))
+
+  end (* local *)
+
   (**
    * Tests for SHA3 Validation System Test Vectors (for Byte-Oriented Messages)
    * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
@@ -325,12 +355,14 @@ struct
     $("sha3vs XOF byte",
       &[ short_messages_xof_test_byte ()
        , long_messages_xof_test_byte ()
+       , variable_messages_xof_test_byte ()
        ])
 
   fun test_sha3vs_xof_bit ignored =
     $("sha3vs XOF bit",
       &[ short_messages_xof_test_bit ()
        , long_messages_xof_test_bit ()
+       , variable_messages_xof_test_bit ()
        ])
 
   fun test ignored =
