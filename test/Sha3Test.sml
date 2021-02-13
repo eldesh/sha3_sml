@@ -234,8 +234,8 @@ struct
    *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs_byte ignored =
-    $("sha3vs(byte)",
+  fun test_sha3vs_hash_byte ignored =
+    $("sha3vs hash byte",
       let
         val test_cases =
           short_messages_test_byte () :: (
@@ -257,8 +257,8 @@ struct
    *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs_bit ignored =
-    $("sha3vs(bit)",
+  fun test_sha3vs_hash_bit ignored =
+    $("sha3vs hash bit",
       let
         val test_cases =
           short_messages_test_bit () :: (
@@ -271,11 +271,21 @@ struct
         &test_cases
       end)
 
+  fun test_sha3vs_xof_byte ignored =
+    $("sha3vs XOF byte",
+     &[])
+
+  fun test_sha3vs_xof_bit ignored =
+    $("sha3vs XOF bit",
+     &[])
+
   fun test ignored =
     $("test",
       &[ test_example_values (),
-         test_sha3vs_byte ignored,
-         test_sha3vs_bit ignored
+         test_sha3vs_hash_byte ignored,
+         test_sha3vs_hash_bit  ignored,
+         test_sha3vs_xof_byte ignored,
+         test_sha3vs_xof_bit  ignored
        ])
 
   fun main (_, args) =
