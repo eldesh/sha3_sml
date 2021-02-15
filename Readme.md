@@ -26,13 +26,20 @@ Sha3SML implements a part of the functions.
 
 ## Environments
 
-This library has been confirmed to work with [SML/NJ] **110.99**, but recent versions should be work well.
-When you generate documents of Sha3SML, [SMLDoc] is also required.
+This library has been developped using the following versions of [SML/NJ][SML/NJ] and [MLton][MLTON].
+However, recent versions should be work well.
+
+- [SML/NJ] 110.99
+- [MLton] 20210117
+
+[SMLDoc][SMLDoc] is also required to generate documentation of Sha3SML.
 
 
 ## Build
 
-To build this library, just run the command `make`. Or run the target `libsha3sml` explicitly.
+### SML/NJ
+
+To build this library and generates docs, specify the target `libsha3sml`.
 
 ```sh
 $ make [libsha3sml]
@@ -45,8 +52,34 @@ If you do not need to generate documentation, run the `libsha3sml-nodoc` target.
 $ make libsha3sml-nodoc
 ```
 
+### MLton
+
+MLton is a whole optimizing compiler, so any `build` target is not provided.
+But the target `libsha3sml` and `libsha3sml-nodoc` are provided for type checking and generating documentation (option).
+
+
+Type checking:
+
+```sh
+$ make -f Makefile.mlton libsha3sml
+```
+
+Type checking without docs:
+
+```sh
+$ make -f Makefile.mlton
+```
+
+Or specify the target `libsha3sml-nodoc`.
+
+```sh
+$ make -f Makefile.mlton libsha3sml-nodoc
+```
+
 
 ## Install
+
+### SML/NJ
 
 To install `libsha3sml`, run the `install` target.
 
@@ -66,10 +99,30 @@ These targets will instruct you to add an entry to your _PATHCONFIG_ file.
 $ echo 'libsha3sml.cm /path/to/install/libsha3sml.cm' >> ~/.smlnj-pathconfig
 ```
 
+### MLton
+
+To install `libsha3sml`, specify the `install` target.
+
+```sh
+$ make -f Makefile.mlton install [PREFIX=/path/to/install]
+```
+
+or without doc:
+
+```sh
+$ make -f Makefile.mlton install-nodoc [PREFIX=/path/to/install]
+```
+
+These targets will instruct you to add an entry to your `mlb-path-map` file.
+
+```sh
+$ echo 'LIBSHA3SML /path/to/install/libsha3sml' >> /path/to/lib/mlb-path-map
+```
+
 
 ## How to use
 
-### Use from other projects
+### SML/NJ: Use from other projects
 
 After installation, Sha3SML can be referenced from other projects as `$/libsha3sml.cm` like:
 
@@ -82,7 +135,7 @@ is
   main.sml
 ```
 
-### Load to the interactive environment
+### SML/NJ: Load to the interactive environment
 
 Users also can load Sha3SML into the interactive environment:
 
@@ -99,7 +152,25 @@ val it = "A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A" :
 ```
 
 
+### MLton
+
+After installation, Sha3SML can be referenced from other projects as `$(LIBSHA3SML)/libsha3sml.mlb` like:
+
+```
+(* sources.mlb *)
+$(SML_LIB)/basis/basis.cm
+$(LIBSHA3SML)/libsha3sml.mlb
+main.sml
+```
+
+```sh
+$ mlton -mlb-path-map /path/to/lib/mlb-path-map sources.sml && ./sources
+```
+
+
 ## Document
+
+### SML/NJ
 
 The `doc` target generates documentation using [SMLDoc].
 
@@ -107,27 +178,56 @@ The `doc` target generates documentation using [SMLDoc].
 $ make doc
 ```
 
+### MLton
+
+The `doc` target generates documentation using [SMLDoc].
+
+```sh
+$ make -f Makefile.mlton doc
+```
+
 
 ## Test
 
 Sha3SML is validated using a number of test cases consisting of examples with intermediate values provided in [Cryptographic Standards and Guidelines][EXVALS] and test vectors provided in [Cryptographic Algorithm Validation Program][CAVP].
 
-To run unit test, run the `test` target. This target depends on [SMLUnit].
+To run unit tests, run the `test` target.
+This target requires [SMLUnit].
 
-```sh
-$ make test
-```
+- SML/NJ
+
+    ```sh
+    $ make test
+    ```
+
+- MLton
+
+    ```sh
+    $ make -f Makefile.mlton test
+    ```
+
+### More Test
 
 Additionally, if you want to test this library thoroughly, run the `test-ignored` target.
-This target will test the generation of over 100,000 digests in addition to a large number of test cases.
+This target will test the generation of over 100,000 digests large number of test cases along with [CAVP].
 This test will take several hours to run.
 
-```sh
-$ make test-ignored
-```
+- SML/NJ
+
+    ```sh
+    $ make test-ignored
+    ```
+
+- MLton
+
+    ```sh
+    $ make -f Makefile.mlton test-ignored
+    ```
 
 
 [SML/NJ]: https://www.smlnj.org/ "Standard ML of New Jersey"
+
+[MLTON]: https://github.com/mlton/mlton/ "MLton"
 
 [SMLDoc]: https://www.pllab.riec.tohoku.ac.jp/smlsharp//?SMLDoc "SMLDoc"
 
