@@ -1,0 +1,8 @@
+local
+  src/sources.mlb
+in
+  signature SHA3
+  structure Keccak
+  structure Sha3Kind
+  structure Sha3
+end
