@@ -1,4 +1,10 @@
-.cm/
 doc/
 bin/
+# smlnj
+.cm/
 libsha3sml.d
+test/sources.d
+# mlton
+libsha3sml.mlb.d
+test/sources
+test/sources.mlb.d
