@@ -116,7 +116,7 @@ $ make -f Makefile.mlton install-nodoc [PREFIX=/path/to/install]
 These targets will instruct you to add an entry to your `mlb-path-map` file.
 
 ```sh
-$ echo 'LIBSHA3SML /path/to/install/libsha3sml' >> /path/to/lib/mlb-path-map
+$ echo 'SHA3SML /path/to/install/libsha3sml' >> /path/to/lib/mlb-path-map
 ```
 
 
@@ -154,12 +154,12 @@ val it = "A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A" :
 
 ### MLton
 
-After installation, Sha3SML can be referenced from other projects as `$(LIBSHA3SML)/libsha3sml.mlb` like:
+After installation, Sha3SML can be referenced from other projects as `$(SHA3SML)/libsha3sml.mlb` like:
 
 ```
 (* sources.mlb *)
 $(SML_LIB)/basis/basis.cm
-$(LIBSHA3SML)/libsha3sml.mlb
+$(SHA3SML)/libsha3sml.mlb
 main.sml
 ```
 
