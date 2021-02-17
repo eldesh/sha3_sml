@@ -1,28 +1,28 @@
 
-SML           ?= sml
+SML             ?= sml
 # -32 or -64
 # empty is default
-SML_BITMODE   ?=
-SML_FLAGS     ?=
-HEAP_SUFFIX   ?= $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
+SML_BITMODE     ?=
+SML_FLAGS       ?=
+HEAP_SUFFIX     ?= $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
 
-SMLDOC        ?= smldoc
+SMLDOC          ?= smldoc
 
-MLBUILD       ?= ml-build
-MLBUILD_FLAGS ?=
+MLBUILD         ?= ml-build
+MLBUILD_FLAGS   ?=
 
 MLDEPENDS       ?= ml-makedepend
 MLDEPENDS_FLAGS ?= -n
 
-SML_DULIST    ?=
+SML_DULIST      ?=
 
-PREFIX        ?= /usr/local/sml
-LIBDIR        ?= lib/libsha3sml.cm
-DOCDIR        ?= doc/libsha3sml
+PREFIX          ?= /usr/local/sml
+LIBDIR          ?= lib/libsha3sml.cm
+DOCDIR          ?= doc/libsha3sml
 
-DEPENDS       := libsha3sml.d test/sources.d
+DEPENDS         := libsha3sml.d test/sources.d
 
-TEST_TARGET   ?= bin/Sha3Test.$(HEAP_SUFFIX)
+TEST_TARGET     ?= bin/Sha3Test.$(HEAP_SUFFIX)
 
 all: libsha3sml-nodoc
 
