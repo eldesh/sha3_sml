@@ -81,6 +81,7 @@ doc:
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
 		--builtinstructure=VectorSlice \
+		--builtinstructure=Timer \
 		--hidebysig \
 		--recursive \
 		--linksource \
