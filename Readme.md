@@ -19,9 +19,9 @@ Sha3SML implements a part of the functions.
 |SHAKE-128    |  ✗       |
 |SHAKE-256    |  ✗       |
 
-✔ empty input is supported
-✔ byte oriented input is supported
-✔ bit oriented input is supported
+- ✔ empty input is supported
+- ✔ byte oriented input is supported
+- ✔ bit oriented input is supported
 
 
 ## Environments
