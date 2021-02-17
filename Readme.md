@@ -49,7 +49,7 @@ The target `libsha3sml` generates documentation of Sha3SML using [SMLDoc].
 If you do not need to generate documentation, run the `libsha3sml-nodoc` target.
 
 ```sh
-$ make libsha3sml-nodoc
+$ make -f Makefile.smlnj libsha3sml-nodoc
 ```
 
 ### MLton
@@ -67,12 +67,6 @@ $ make -f Makefile.mlton libsha3sml
 Type checking without docs:
 
 ```sh
-$ make -f Makefile.mlton
-```
-
-Or specify the target `libsha3sml-nodoc`.
-
-```sh
 $ make -f Makefile.mlton libsha3sml-nodoc
 ```
 
@@ -84,13 +78,13 @@ $ make -f Makefile.mlton libsha3sml-nodoc
 To install `libsha3sml`, run the `install` target.
 
 ```sh
-$ make install [PREFIX=/path/to/install]
+$ make -f Makefile.smlnj install [PREFIX=/path/to/install]
 ```
 
 or without doc:
 
 ```sh
-$ make install-nodoc [PREFIX=/path/to/install]
+$ make -f Makefile.smlnj install-nodoc [PREFIX=/path/to/install]
 ```
 
 These targets will instruct you to add an entry to your _PATHCONFIG_ file.
@@ -175,7 +169,7 @@ $ mlton -mlb-path-map /path/to/lib/mlb-path-map sources.sml && ./sources
 The `doc` target generates documentation using [SMLDoc].
 
 ```sh
-$ make doc
+$ make -f Makefile.smlnj doc
 ```
 
 ### MLton
@@ -197,7 +191,7 @@ This target requires [SMLUnit].
 - SML/NJ
 
     ```sh
-    $ make test
+    $ make -f Makefile.smlnj test
     ```
 
 - MLton
@@ -215,7 +209,7 @@ This test will take several hours to run.
 - SML/NJ
 
     ```sh
-    $ make test-ignored
+    $ make -f Makefile.smlnj test-ignored
     ```
 
 - MLton
