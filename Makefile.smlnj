@@ -49,9 +49,11 @@ $(DEPENDS): %.d: %.cm
 	@$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(CM_SUFFIX)
 	@sed -i -e "s|^\([^#][^:]\+\):|\1 $@:|" $@
 
+
 ifeq (,$(findstring clean,$(MAKECMDGOALS)))
   include $(DEPENDS)
 endif
+
 
 .PHONY: install-nodoc
 install-nodoc: libsha3sml-nodoc
