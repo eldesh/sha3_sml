@@ -6,6 +6,9 @@ SML_BITMODE     ?=
 SML_FLAGS       ?=
 HEAP_SUFFIX     ?= $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
 
+# directory of CM product
+CM_SUFFIX       := $(shell $(SML) $(SML_BITMODE) < script/suffix.sml 2>&1 >/dev/null)
+
 SMLDOC          ?= smldoc
 
 MLBUILD         ?= ml-build
@@ -24,18 +27,18 @@ DEPENDS         := libsha3sml.d test/sources.d
 
 TEST_TARGET     ?= bin/Sha3Test.$(HEAP_SUFFIX)
 
-all: libsha3sml-nodoc
+all: libsha3sml
 
 
 .PHONY: libsha3sml-nodoc
-libsha3sml-nodoc: .cm/$(HEAP_SUFFIX)
+libsha3sml-nodoc: .cm/$(CM_SUFFIX)/libsha3sml.cm
 
 
 .PHONY: libsha3sml
-libsha3sml: .cm/$(HEAP_SUFFIX) doc
+libsha3sml: libsha3sml-nodoc doc
 
 
-.cm/$(HEAP_SUFFIX): libsha3sml.d libsha3sml.cm
+.cm/$(CM_SUFFIX)/%.cm: %.cm
 	@echo "  [SMLNJ] $@"
 	@echo 'CM.stabilize true "libsha3sml.cm";' | $(SML) $(SML_BITMODE) $(SML_DULIST)
 
@@ -43,15 +46,11 @@ libsha3sml: .cm/$(HEAP_SUFFIX) doc
 $(DEPENDS): %.d: %.cm
 	@echo "  [GEN] $@"
 	@touch $@
-	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(HEAP_SUFFIX)
+	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(CM_SUFFIX)
 	@sed -i -e "s|^\([^#][^:]\+\):|\1 $@:|" $@
 
-ifeq (,$(findstring $(MAKECMDGOALS),clean))
-  include libsha3sml.d
-endif
-
-ifeq ($(MAKECMDGOALS),test)
-  include test/sources.d
+ifeq (,$(findstring clean,$(MAKECMDGOALS)))
+  include $(DEPENDS)
 endif
 
 .PHONY: install-nodoc
@@ -64,19 +63,19 @@ install-nodoc: libsha3sml-nodoc
 	@echo "Add an entry to your pathconfig (e.g. ~/.smlnj-pathconfig) such like:"
 	@echo "\tlibsha3sml.cm $(PREFIX)/$(LIBDIR)"
 	@echo "Then you can load the library like"
-	@echo "\t\"CM.make \"$$/libsha3sml.cm\";\"."
+	@echo "\t- CM.make \"$$/libsha3sml.cm\";"
 	@echo "================================================================"
 
 
 .PHONY: install
-install: install-nodoc install-doc
+install: install-doc install-nodoc
 
 
 .PHONY: doc
 doc:
-	@echo "  [SMLDoc] $@"
-	@$(RM) -r doc
-	@mkdir doc
+	@echo "  [SMLDoc]"
+	@$(RM) -r $(DOCDIR)
+	@install -d $(DOCDIR)
 	@$(SMLDOC) -c UTF-8 \
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
@@ -85,28 +84,28 @@ doc:
 		--hidebysig \
 		--recursive \
 		--linksource \
-		-d doc \
+		-d $(DOCDIR) \
 		libsha3sml.cm
 
 
 .PHONY: install-doc
 install-doc: doc
 	@install -d $(PREFIX)/$(DOCDIR)
-	@cp -prT doc $(PREFIX)/$(DOCDIR)
+	@cp -prT $(DOCDIR) $(PREFIX)/$(DOCDIR)
 	@echo "================================================================"
 	@echo "Generated API Documents of Sha3SML"
 	@echo "\t$(PREFIX)/$(DOCDIR)"
 	@echo "================================================================"
 
 
-$(TEST_TARGET): libsha3sml-nodoc test/sources.cm
+$(TEST_TARGET): test/.cm/$(CM_SUFFIX)
 	@mkdir -p bin
-	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) test/sources.cm Sha3Test.main $@
+	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) $(patsubst %/.cm/$(CM_SUFFIX),%/sources.cm,$<) Sha3Test.main $@
 
 
 .PHONY: test
 test: $(TEST_TARGET)
-	@$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$<
+	$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$<
 
 
 .PHONY: test-ignored
@@ -117,7 +116,7 @@ test-ignored: $(TEST_TARGET)
 .PHONY: clean
 clean:
 	-$(RM) $(DEPENDS)
-	-$(RM) -r doc
+	-$(RM) -r $(DOCDIR)
 	-$(RM) $(TEST_TARGET)
 	-$(RM) -r .cm
 	-$(RM) -r src/.cm
