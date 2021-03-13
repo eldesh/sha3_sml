@@ -32,19 +32,14 @@ When you generate documents of Sha3SML, [SMLDoc] is also required.
 
 ## Build
 
-To build this library and generates docs using [SMLDoc], specify the target `libsha3sml`.
+To build this library, just run the command `make`. Or run the target `libsha3sml` explicitly.
 
 ```sh
-$ make libsha3sml
+$ make [libsha3sml]
 ```
 
-To build `libsha3sml` without docs, just run the `make` command.
-
-```sh
-$ make
-```
-
-Or specify the target `libsha3sml-nodoc`.
+The target `libsha3sml` generates documentation of Sha3SML using [SMLDoc].
+If you do not need to generate documentation, run the `libsha3sml-nodoc` target.
 
 ```sh
 $ make libsha3sml-nodoc
@@ -53,7 +48,7 @@ $ make libsha3sml-nodoc
 
 ## Install
 
-To install `libsha3sml`, specify the `install` target.
+To install `libsha3sml`, run the `install` target.
 
 ```sh
 $ make install [PREFIX=/path/to/install]
@@ -106,7 +101,7 @@ val it = "A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A" :
 
 ## Document
 
-The `doc` target generates documents using [SMLDoc].
+The `doc` target generates documentation using [SMLDoc].
 
 ```sh
 $ make doc
@@ -117,8 +112,7 @@ $ make doc
 
 Sha3SML is validated using a number of test cases consisting of examples with intermediate values provided in [Cryptographic Standards and Guidelines][EXVALS] and test vectors provided in [Cryptographic Algorithm Validation Program][CAVP].
 
-To run unit tests, run the `test` target.
-To run this target, [SMLUnit] is required.
+To run unit test, run the `test` target. This target depends on [SMLUnit].
 
 ```sh
 $ make test
