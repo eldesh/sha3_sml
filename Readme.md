@@ -26,7 +26,7 @@ Sha3SML implements a part of the functions.
 
 ## Environments
 
-This library has been developped with [SML/NJ] **110.98**, but recent versions should be work well.
+This library has been confirmed to work with [SML/NJ] **110.99**, but recent versions should be work well.
 When you generate documents of Sha3SML, [SMLDoc] is also required.
 
 
@@ -71,14 +71,14 @@ $ echo 'libsha3sml.cm /path/to/install/libsha3sml.cm' >> ~/.smlnj-pathconfig
 
 ### Use from other projects
 
-After installation, Sha3SML can be referenced from other projects as `$/sha3sml.cm` like:
+After installation, Sha3SML can be referenced from other projects as `$/libsha3sml.cm` like:
 
 ```
 (* sources.cm *)
 group
 is
   $/basis.cm
-  $/sha3sml.cm
+  $/libsha3sml.cm
   main.sml
 ```
 
