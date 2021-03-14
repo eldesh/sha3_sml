@@ -1,42 +1,46 @@
 
-MLTON          ?= mlton
-MLTON_FLAGS    ?= -default-ann "nonexhaustiveMatch ignore"
+MLTON               := mlton
+MLTON_FLAGS         :=
 ifneq ($(MLB_PATH_MAP),)
-MLTON_FLAGS    += -mlb-path-map $(MLB_PATH_MAP)
+MLTON_FLAGS         += -mlb-path-map $(MLB_PATH_MAP)
 endif
 
-SMLDOC         ?= smldoc
+SMLDOC              := smldoc
 
-PREFIX         ?= /usr/local/mlton
-LIBDIR         ?= lib/libsha3sml
-DOCDIR         ?= doc/libsha3sml
+PREFIX              := /usr/local/mlton
+LIBDIR              := lib/libsha3sml
+DOCDIR              := doc/libsha3sml
 
-LIBSHA3SML_MLB      ?= libsha3sml.mlb
-LIBSHA3SML_TEST_MLB ?= test/sources.mlb
-LIBSHA3SML_MLBS     ?= $(LIBSHA3SML_MLB)      \
-                       $(LIBSHA3SML_TEST_MLB)
+TEST_MLB            := test/sources.mlb
+LIBSHA3SML_MLBS     := libsha3sml.mlb \
+                       $(TEST_MLB)
+
+DEPENDS             := $(LIBSHA3SML_MLBS:.mlb=.mlb.d)
+
+TYPECHECK_DUMMY     := bin/.libsha3sml
 
 
-all: libsha3sml-nodoc
+all: libsha3sml
 
 
 .PHONY: libsha3sml-nodoc
-libsha3sml-nodoc: typecheck_sha3sml
+libsha3sml-nodoc: $(TYPECHECK_DUMMY)
 
 
 .PHONY: libsha3sml
 libsha3sml: libsha3sml-nodoc doc
 
 
-.PHONY: typecheck_sha3sml
-typecheck_sha3sml: $(LIBSHA3SML_MLB)
-	@echo "  [MLTON] typecheck $<"
-	@$(MLTON) $(MLTON_FLAGS) -stop tc $<
-
-
-$(LIBSHA3SML_TEST_MLB:.mlb=): %: %.mlb
-	@echo "  [MLTON] $@"
+$(TYPECHECK_DUMMY): libsha3sml.mlb
+	@echo "  [MLTON] typecheck: $^"
 	@$(MLTON) $(MLTON_FLAGS) -output $@ $<
+
+
+libsha3sml.mlb.d: libsha3sml.mlb
+	@echo "  [GEN] $@"
+	@$(SHELL) -ec '$(MLTON) $(MLTON_FLAGS) -stop f $< \
+		| sed -e "1i$(TYPECHECK_DUMMY) $@:\\\\" -e "s|.*|  & \\\\|" -e "\$$s| \\\\||" > $@; \
+		[ -s $@ ] || rm -rf $@'
 
 
 %.mlb.d: %.mlb
@@ -46,20 +50,15 @@ $(LIBSHA3SML_TEST_MLB:.mlb=): %: %.mlb
 		[ -s $@ ] || rm -rf $@'
 
 
-.PHONY: test
-test: typecheck_sha3sml $(LIBSHA3SML_TEST_MLB:.mlb=)
-	$(LIBSHA3SML_TEST_MLB:.mlb=)
-
-
 ifeq ($(findstring clean,$(MAKECMDGOALS)),)
-  include $(LIBSHA3SML_MLBS:.mlb=.mlb.d)
+  include $(DEPENDS)
 endif
 
 
 .PHONY: install-nodoc
 install-nodoc: libsha3sml-nodoc
 	@install -d $(PREFIX)/$(LIBDIR)
-	@$(MLTON) $(MLTON_FLAGS) -stop f $(LIBSHA3SML_MLB) | \
+	@$(MLTON) $(MLTON_FLAGS) -stop f libsha3sml.mlb | \
 	while read file; do \
 		if expr $$(readlink -f $$file) : ^$$(pwd) >/dev/null; then \
 			cp --parents $$(realpath --relative-to=$$(pwd) $$file) $(PREFIX)/$(LIBDIR); \
@@ -67,21 +66,21 @@ install-nodoc: libsha3sml-nodoc
 		fi; \
 	done
 	@echo "Installation has been completed."
-	@echo "Please add the entry to your mlb path map file:"
+	@echo "Add the entry to your mlb path map file:"
 	@echo ""
 	@echo "  SHA3SML $(PREFIX)/$(LIBDIR)"
 	@echo ""
 
 
 .PHONY: install
-install: install-nodoc install-doc
+install: install-doc install-nodoc
 
 
 .PHONY: doc
 doc:
-	@echo "  [SMLDoc] $@"
-	@$(RM) -r doc
-	@mkdir doc
+	@echo "  [SMLDoc] $(DOCDIR)"
+	@$(RM) -r $(DOCDIR)
+	@install -d $(DOCDIR)
 	@$(SMLDOC) -c UTF-8 \
 		--builtinstructure=Word8 \
 		--builtinstructure=TextIO \
@@ -89,22 +88,33 @@ doc:
 		--hidebysig \
 		--recursive \
 		--linksource \
-		-d doc \
+		-d $(DOCDIR) \
 		libsha3sml.cm
 
 
 .PHONY: install-doc
 install-doc: doc
 	@install -d $(PREFIX)/$(DOCDIR)
-	@cp -prT doc $(PREFIX)/$(DOCDIR)
+	@cp -prT $(DOCDIR) $(PREFIX)/$(DOCDIR)
 	@echo "================================================================"
 	@echo "Generated API Documents of Sha3SML"
 	@echo "\t$(PREFIX)/$(DOCDIR)"
 	@echo "================================================================"
 
 
+$(TEST_MLB:.mlb=): %: %.mlb
+	@echo "  [MLTON] $@"
+	@$(MLTON) $(MLTON_FLAGS) -output $@ $<
+
+
+.PHONY: test
+test: $(TEST_MLB:.mlb=)
+	$(TEST_MLB:.mlb=)
+
+
 .PHONY: clean
 clean:
-	-$(RM) $(LIBSHA3SML_MLBS:.mlb=)
-	-$(RM) $(LIBSHA3SML_MLBS:.mlb=.mlb.d)
-	-$(RM) -r doc
+	-$(RM) $(TYPECHECK_DUMMY)
+	-$(RM) $(DEPENDS)
+	-$(RM) -r $(DOCDIR)
+	-$(RM) $(filter-out libsha3sml,$(LIBSHA3SML_MLBS:.mlb=))
