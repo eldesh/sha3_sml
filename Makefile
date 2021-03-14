@@ -1,31 +1,31 @@
 
-SML             ?= sml
+SML             := sml
 # -32 or -64
 # empty is default
-SML_BITMODE     ?=
-SML_FLAGS       ?=
-HEAP_SUFFIX     ?= $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
+SML_BITMODE     :=
+SML_FLAGS       :=
+HEAP_SUFFIX     := $(shell $(SML) $(SML_BITMODE) @SMLsuffix)
 
 # directory of CM product
 CM_SUFFIX       := $(shell $(SML) $(SML_BITMODE) < script/suffix.sml 2>&1 >/dev/null)
 
-SMLDOC          ?= smldoc
+SMLDOC          := smldoc
 
-MLBUILD         ?= ml-build
-MLBUILD_FLAGS   ?=
+MLBUILD         := ml-build
+MLBUILD_FLAGS   :=
 
-MLDEPENDS       ?= ml-makedepend
-MLDEPENDS_FLAGS ?= -n
+MLDEPENDS       := ml-makedepend
+MLDEPENDS_FLAGS := -n
 
-SML_DULIST      ?=
+SML_DULIST      :=
 
-PREFIX          ?= /usr/local/sml
-LIBDIR          ?= lib/libsha3sml.cm
-DOCDIR          ?= doc/libsha3sml
+PREFIX          := /usr/local/sml
+LIBDIR          := lib/libsha3sml.cm
+DOCDIR          := doc/libsha3sml
 
 DEPENDS         := libsha3sml.d test/sources.d
 
-TEST_TARGET     ?= bin/Sha3Test.$(HEAP_SUFFIX)
+TEST_TARGET     := bin/Sha3Test.$(HEAP_SUFFIX)
 
 all: libsha3sml
 
@@ -46,7 +46,7 @@ libsha3sml: libsha3sml-nodoc doc
 $(DEPENDS): %.d: %.cm
 	@echo "  [GEN] $@"
 	@touch $@
-	$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(CM_SUFFIX)
+	@$(MLDEPENDS) $(MLDEPENDS_FLAGS) $(SML_BITMODE) $(SML_DULIST) -f $@ $< $(dir $<).cm/$(CM_SUFFIX)
 	@sed -i -e "s|^\([^#][^:]\+\):|\1 $@:|" $@
 
 ifeq (,$(findstring clean,$(MAKECMDGOALS)))
@@ -100,7 +100,7 @@ install-doc: doc
 
 $(TEST_TARGET): test/.cm/$(CM_SUFFIX)
 	@mkdir -p bin
-	$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) $(patsubst %/.cm/$(CM_SUFFIX),%/sources.cm,$<) Sha3Test.main $@
+	@$(MLBUILD) $(SML_BITMODE) $(SML_DULIST) $(MLBUILD_FLAGS) $(patsubst %/.cm/$(CM_SUFFIX),%/sources.cm,$<) Sha3Test.main $@
 
 
 .PHONY: test
@@ -110,7 +110,7 @@ test: $(TEST_TARGET)
 
 .PHONY: test-ignored
 test-ignored: $(TEST_TARGET)
-	@$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$< --ignored
+	$(SML) $(SML_BITMODE) $(SML_DULIST) $(SML_FLAGS) @SMLload=$< --ignored
 
 
 .PHONY: clean
