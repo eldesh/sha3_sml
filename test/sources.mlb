@@ -1,6 +1,10 @@
 $(SML_LIB)/basis/basis.mlb
 $(SMLUNIT_LIB)/smlunit-lib.mlb
-../src/sources.mlb
-Sha3VS.sml
-Sha3Test.sml
-runtest.sml
+ann
+  "nonexhaustiveBind ignore"
+in
+  ../src/sources.mlb
+  Sha3VS.sml
+  Sha3Test.sml
+  runtest.sml
+end
