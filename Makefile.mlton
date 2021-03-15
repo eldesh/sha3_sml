@@ -1,6 +1,7 @@
 
 MLTON               := mlton
 MLTON_FLAGS         :=
+# path to the file `mlb-path-map`
 ifneq ($(MLB_PATH_MAP),)
 MLTON_FLAGS         += -mlb-path-map $(MLB_PATH_MAP)
 endif
@@ -32,8 +33,9 @@ libsha3sml: libsha3sml-nodoc doc
 
 
 $(TYPECHECK_DUMMY): libsha3sml.mlb
-	@echo "  [MLTON] typecheck: $^"
-	@$(MLTON) $(MLTON_FLAGS) -output $@ $<
+	@echo "  [MLTON] typecheck: $<"
+	@$(MLTON) $(MLTON_FLAGS) -stop tc $<
+	@touch $@
 
 
 libsha3sml.mlb.d: libsha3sml.mlb
