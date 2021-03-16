@@ -114,6 +114,11 @@ test: $(TEST_MLB:.mlb=)
 	$(TEST_MLB:.mlb=)
 
 
+.PHONY: test-ignored
+test-ignored: $(TEST_MLB:.mlb=)
+	$(TEST_MLB:.mlb=) --ignored
+
+
 .PHONY: clean
 clean:
 	-$(RM) $(TYPECHECK_DUMMY)
