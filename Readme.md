@@ -64,7 +64,7 @@ Type checking:
 $ make -f Makefile.mlton libsha3sml
 ```
 
-Type checking without docs:
+Type checking without generating documentations:
 
 ```sh
 $ make -f Makefile.mlton libsha3sml-nodoc
@@ -95,7 +95,7 @@ $ echo 'libsha3sml.cm /path/to/install/libsha3sml.cm' >> ~/.smlnj-pathconfig
 
 ### MLton
 
-To install `libsha3sml`, specify the `install` target.
+To install `libsha3sml`, run the `install` target.
 
 ```sh
 $ make -f Makefile.mlton install [PREFIX=/path/to/install]
