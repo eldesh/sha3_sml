@@ -3,7 +3,7 @@ is
   $/basis-2004.cm
   ForLoop.sml
 #if defined (MEASURE)
-  Measure.sml
+  MeasureTimer.sml
 #else
   MeasureDummy.sml
 #endif

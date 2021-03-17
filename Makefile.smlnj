@@ -17,6 +17,7 @@ MLBUILD_FLAGS   :=
 MLDEPENDS       := ml-makedepend
 MLDEPENDS_FLAGS := -n
 
+# for profiling, set '-DMEASURE'
 SML_DULIST      :=
 
 PREFIX          := /usr/local/sml
