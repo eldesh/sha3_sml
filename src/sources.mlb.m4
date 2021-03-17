@@ -1,6 +1,6 @@
 $(SML_LIB)/basis/basis.mlb
 ForLoop.sml
-MeasureDummy.sml
+ifdef(`MEASURE',Measure.sml,MeasureDummy.sml)
 Bit.sml
 BIT_ARRAY.sig
 BitArray.sml
