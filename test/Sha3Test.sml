@@ -286,5 +286,8 @@ struct
     TextIO.flushOut TextIO.stdOut;
     OS.Process.success
   end
+
+  fun main' () =
+    main (CommandLine.name(), CommandLine.arguments())
 end
 

@@ -1,0 +1,112 @@
+
+POLYML         := poly
+POLYMLC        := polyc
+POLYMLFLAGS    := -q --error-exit --eval 'PolyML.suffixes := ".sig"::(!PolyML.suffixes)'
+
+PREFIX         := /usr/local/polyml
+LIBDIR         := lib/libsha3sml
+DOCDIR         := doc/libsha3sml
+
+SMLDOC         := smldoc
+
+SRC            := $(wildcard src/*.sml src/*.sig)
+TEST_SRC       := $(wildcard test/*.sml)
+
+LIBSHA3SML     := libsha3sml.poly
+TEST           := bin/libsha3sml-test-poly
+
+define export-module
+@echo "  [POLYML] $@"
+@echo "" | $(POLYML) $(POLYMLFLAGS) \
+	$(foreach dep,$(3),--eval 'PolyML.loadModule "$(dep)"') \
+	--eval 'PolyML.make "$(2)"' \
+	--eval 'PolyML.export("$@", $(1))'
+endef
+
+
+all: libsha3sml
+
+
+.PHONY: libsha3sml-nodoc
+libsha3sml-nodoc: $(LIBSHA3SML)
+
+
+.PHONY: libsha3sml
+libsha3sml: libsha3sml-nodoc doc
+
+
+$(LIBSHA3SML): export.sml $(SRC)
+	@echo "  [POLYML] $@"
+	@echo "" | $(POLYML) $(POLYMLFLAGS) \
+		--use src/MeasureDummy.sml \
+		--eval 'PolyML.make "src"' \
+		--use export.sml \
+		--eval 'PolyML.SaveState.saveModule ("$(LIBSHA3SML)", Sha3)'
+
+
+$(TEST).o: $(LIBSHA3SML) $(TEST_SRC)
+	$(call export-module,Sha3Test.main'\'',test,./$< $(SMLUNIT_LIB))
+
+
+$(TEST): %: %.o
+	@echo "  [POLYC] $@"
+	@$(POLYMLC) -o $@ $^
+
+
+.PHONY: install-nodoc
+install-nodoc: libsha3sml-nodoc
+	@install -D -m 644 -t $(PREFIX)/$(LIBDIR) $(LIBSHA3SML)
+	@echo "================================================================"
+	@echo "libsha3sml has been installed to:"
+	@echo "\t$(PREFIX)/$(LIBDIR)/$(LIBSHA3SML)"
+	@echo "================================================================"
+
+
+.PHONY: install
+install: install-doc install-nodoc
+
+
+.PHONY: doc
+doc:
+	@echo "  [SMLDoc]"
+	@$(RM) -r $(DOCDIR)
+	@install -d $(DOCDIR)
+	@$(SMLDOC) -c UTF-8 \
+		--builtinstructure=Word8 \
+		--builtinstructure=TextIO \
+		--builtinstructure=VectorSlice \
+		--builtinstructure=Timer \
+		--hidebysig \
+		--recursive \
+		--linksource \
+		-d $(DOCDIR) \
+		libsha3sml.cm
+
+
+.PHONY: install-doc
+install-doc: doc
+	@install -d $(PREFIX)/$(DOCDIR)
+	@cp -prT $(DOCDIR) $(PREFIX)/$(DOCDIR)
+	@echo "================================================================"
+	@echo "Generated API Documents of SMLUnit"
+	@echo "\t$(PREFIX)/$(DOCDIR)"
+	@echo "================================================================"
+
+
+.PHONY: test
+test: $(TEST)
+	./$(TEST)
+
+
+.PHONY: test-ignored
+test-ignored: $(TEST)
+	./$(TEST) --ignored
+
+
+.PHONY: clean
+clean:
+	-$(RM) $(LIBSHA3SML)
+	-$(RM) -r $(DOCDIR)
+	-$(RM) $(TEST)
+	-$(RM) $(TEST:=.o)
+
