@@ -1,7 +1,9 @@
 
 POLYML         := poly
 POLYMLC        := polyc
-POLYMLFLAGS    := -q --error-exit --eval 'PolyML.suffixes := ".sig"::(!PolyML.suffixes)'
+POLYMLFLAGS    := -q --error-exit \
+                  --eval 'PolyML.suffixes := ".sig"::(!PolyML.suffixes)' \
+                  --use script/loadModule.sml
 
 PREFIX         := /usr/local/polyml
 LIBDIR         := lib/libsha3sml
@@ -15,10 +17,15 @@ TEST_SRC       := $(wildcard test/*.sml)
 LIBSHA3SML     := libsha3sml.poly
 TEST           := bin/libsha3sml-test-poly
 
+# Path to the directory which contains the binary module of [SMLUnit] like:
+# > make -f Makefile.polyml POLYML_LIBDIR=~/.sml/polyml/5.8.1/lib
+POLYML_LIBDIR  := SPECIFY_THE_POLYML_LIBDIR
+
+
 define export-module
 @echo "  [POLYML] $@"
 @echo "" | $(POLYML) $(POLYMLFLAGS) \
-	$(foreach dep,$(3),--eval 'PolyML.loadModule "$(dep)"') \
+	$(foreach dep,$(3),--eval 'loadModule "$(dep)"') \
 	--eval 'PolyML.make "$(2)"' \
 	--eval 'PolyML.export("$@", $(1))'
 endef
@@ -45,7 +52,7 @@ $(LIBSHA3SML): export.sml $(SRC)
 
 
 $(TEST).o: $(LIBSHA3SML) $(TEST_SRC)
-	$(call export-module,Sha3Test.main'\'',test,./$< $(SMLUNIT_LIB))
+	$(call export-module,Sha3Test.main'\'',test,'./$<' '$(POLYML_LIBDIR)/smlunit-lib/smlunit-lib.poly')
 
 
 $(TEST): %: %.o
