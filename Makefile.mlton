@@ -39,14 +39,14 @@ $(TYPECHECK_DUMMY): libsha3sml.mlb
 	@touch $@
 
 
-# for profiling, define MEASURE
-# > make MEASURE= test
+# for profiling, define 'MEASURE=Timer' like:
+# > make MEASURE=Timer test
 src/sources.mlb: src/sources.mlb.m4
 	@echo "  [M4] $@"
-ifdef MEASURE
-	m4 -DMEASURE $< > $@
+ifeq "$(MEASURE)" "Timer"
+	@m4 -DMEASURE $< > $@
 else
-	m4 $< > $@
+	@m4 $< > $@
 endif
 
 
