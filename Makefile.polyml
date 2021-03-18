@@ -21,6 +21,13 @@ TEST           := bin/libsha3sml-test-poly
 # > make -f Makefile.polyml POLYML_LIBDIR=~/.sml/polyml/5.8.1/lib
 POLYML_LIBDIR  := SPECIFY_THE_POLYML_LIBDIR
 
+# For profiling, define 'MEASURE=Timer' like:
+# > make -f Makefile.polyml MEASURE=Timer test
+ifeq "$(MEASURE)" "Timer"
+	MEASURE_MODULE = MeasureTimer.sml
+else
+	MEASURE_MODULE = MeasureDummy.sml
+endif
 
 define export-module
 @echo "  [POLYML] $@"
@@ -45,7 +52,7 @@ libsha3sml: libsha3sml-nodoc doc
 $(LIBSHA3SML): export.sml $(SRC)
 	@echo "  [POLYML] $@"
 	@echo "" | $(POLYML) $(POLYMLFLAGS) \
-		--use src/MeasureDummy.sml \
+		--use src/$(MEASURE_MODULE) \
 		--eval 'PolyML.make "src"' \
 		--use export.sml \
 		--eval 'PolyML.SaveState.saveModule ("$(LIBSHA3SML)", Sha3)'
