@@ -6,5 +6,8 @@ libsha3sml.d
 test/sources.d
 # mlton
 libsha3sml.mlb.d
+src/sources.mlb
 test/sources
 test/sources.mlb.d
+# polyml
+libsha3sml.poly
