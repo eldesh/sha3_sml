@@ -128,12 +128,13 @@ struct
 
   local
     fun hash kind = Sha3.hashVector kind
+    fun println s = (print s; print "\n")
     fun read_test_case path =
       let val (kind, cases) = Sha3VS.parse path in
         $(OS.Path.file path,
             &(map (fn C as {msg, digest} =>
                     (
-                    (* print (Sha3VS.Case.toString C); *)
+                    (* println (Sha3VS.Case.toString C); *)
                      %(fn()=> assert_eq (`digest) (hash kind msg))
                     )
                   )
@@ -175,6 +176,57 @@ struct
           , "test/sha3_bittestvectors/SHA3_384LongMsg.rsp"
           , "test/sha3_bittestvectors/SHA3_512LongMsg.rsp"
           ]))
+
+  end (* local *)
+
+  local
+    fun hash kind = Sha3.hashVector kind
+    fun bit2shake 128 = Sha3Kind.Shake128
+      | bit2shake 256 = Sha3Kind.Shake256
+    fun println s = (print s; print "\n")
+    fun read_test_case (bit, path) =
+      let
+        val (outlen, cases) = Sha3VS.parse_xof path
+      in
+        $(OS.Path.file path,
+            &(map (fn C as {len, msg, output} =>
+                    (
+                     (* println (Sha3VS.ShakeCase.toString C); *)
+                     %(fn()=> assert_eq (`output) (hash (bit2shake bit outlen) (msg, len mod 8)))
+                    )
+                  )
+                cases))
+      end
+  in
+
+  fun short_messages_xof_test_byte () =
+    $("ShortMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bytetestvectors/SHAKE128ShortMsg.rsp")
+          , (256, "test/shake_bytetestvectors/SHAKE256ShortMsg.rsp")
+          ]))
+
+  fun long_messages_xof_test_byte () =
+    $("LongMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bytetestvectors/SHAKE128LongMsg.rsp")
+          , (256, "test/shake_bytetestvectors/SHAKE256LongMsg.rsp")
+          ]))
+
+  fun short_messages_xof_test_bit () =
+    $("ShortMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bittestvectors/SHAKE128ShortMsg.rsp")
+          , (256, "test/shake_bittestvectors/SHAKE256ShortMsg.rsp")
+          ]))
+
+  fun long_messages_xof_test_bit () =
+    $("LongMessagesXOFTest",
+      &(map read_test_case
+          [ (128, "test/shake_bittestvectors/SHAKE128LongMsg.rsp")
+          , (256, "test/shake_bittestvectors/SHAKE256LongMsg.rsp")
+          ]))
+
 
   end (* local *)
 
@@ -225,6 +277,37 @@ struct
 
   end (* local *)
 
+  local
+    fun hash kind = Sha3.hashVector kind
+    fun println s = (print s; print "\n")
+    fun read_test_case path =
+      let val cases = Sha3VS.parse_xof_variable path in
+        $(OS.Path.file path,
+            &(map (fn C as {count, kind, msg, output} =>
+                    (
+                     (* println (Sha3VS.VariableOutCase.toString C); *)
+                     %(fn()=> assert_eq (`output) (hash kind (msg, 0)))
+                    )
+                  )
+                cases))
+      end
+  in
+  fun variable_messages_xof_test_byte () =
+    $("VariableMessagesXOFTest",
+      &(map read_test_case
+          [ "test/shake_bytetestvectors/SHAKE128VariableOut.rsp"
+          , "test/shake_bytetestvectors/SHAKE256VariableOut.rsp"
+          ]))
+
+  fun variable_messages_xof_test_bit () =
+    $("VariableMessagesXOFTest",
+      &(map read_test_case
+          [ "test/shake_bittestvectors/SHAKE128VariableOut.rsp"
+          , "test/shake_bittestvectors/SHAKE256VariableOut.rsp"
+          ]))
+
+  end (* local *)
+
   (**
    * Tests for SHA3 Validation System Test Vectors (for Byte-Oriented Messages)
    * Test cases use test vectors of CAVP (Cryptographic Algorithm Validation Progoram).
@@ -234,18 +317,16 @@ struct
    *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs_byte ignored =
-    $("sha3vs(byte)",
+  fun test_sha3vs_hash_byte ignored =
+    $("sha3vs hash byte",
       let
-        val test_cases =
-          short_messages_test_byte () :: (
-          if ignored
-          then [ long_messages_test_byte ()
-               , pseudorandomly_generated_messages_test_byte ()
-               ]
-          else [ ])
+        val long = if ignored then
+                     [ long_messages_test_byte ()
+                     , pseudorandomly_generated_messages_test_byte ()
+                     ]
+                   else [ ]
       in
-        &test_cases
+        &(short_messages_test_byte () :: long)
       end)
 
   (**
@@ -257,25 +338,47 @@ struct
    *        The Pseudorandomly Generated Messages Test.
    * @see https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#sha3vsha3vss
    *)
-  fun test_sha3vs_bit ignored =
-    $("sha3vs(bit)",
+  fun test_sha3vs_hash_bit ignored =
+    $("sha3vs hash bit",
       let
-        val test_cases =
-          short_messages_test_bit () :: (
-          if ignored
-          then [ long_messages_test_bit ()
-               , pseudorandomly_generated_messages_test_bit ()
-               ]
-          else [ ])
+        val long = if ignored then
+                     [ long_messages_test_bit ()
+                     , pseudorandomly_generated_messages_test_bit ()
+                     ]
+                   else [ ]
       in
-        &test_cases
+        &(short_messages_test_bit () :: long)
+      end)
+
+  fun test_sha3vs_xof_byte ignored =
+    $("sha3vs XOF byte",
+      let
+        val long = if ignored then
+                     [ long_messages_xof_test_byte ()
+                     , variable_messages_xof_test_byte () ]
+                   else []
+      in
+        &(short_messages_xof_test_byte () :: long)
+      end)
+
+  fun test_sha3vs_xof_bit ignored =
+    $("sha3vs XOF bit",
+      let
+        val long = if ignored then
+                     [ long_messages_xof_test_bit ()
+                     , variable_messages_xof_test_bit () ]
+                   else []
+      in
+        &(short_messages_xof_test_bit () :: long)
       end)
 
   fun test ignored =
     $("test",
       &[ test_example_values (),
-         test_sha3vs_byte ignored,
-         test_sha3vs_bit ignored
+         test_sha3vs_hash_byte ignored,
+         test_sha3vs_hash_bit  ignored,
+         test_sha3vs_xof_byte ignored,
+         test_sha3vs_xof_bit  ignored
        ])
 
   fun main (_, args) =
