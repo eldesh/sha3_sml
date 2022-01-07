@@ -320,15 +320,13 @@ struct
   fun test_sha3vs_hash_byte ignored =
     $("sha3vs hash byte",
       let
-        val test_cases =
-          short_messages_test_byte () :: (
-          if ignored
-          then [ long_messages_test_byte ()
-               , pseudorandomly_generated_messages_test_byte ()
-               ]
-          else [ ])
+        val long = if ignored then
+                     [ long_messages_test_byte ()
+                     , pseudorandomly_generated_messages_test_byte ()
+                     ]
+                   else [ ]
       in
-        &test_cases
+        &(short_messages_test_byte () :: long)
       end)
 
   (**
@@ -343,15 +341,13 @@ struct
   fun test_sha3vs_hash_bit ignored =
     $("sha3vs hash bit",
       let
-        val test_cases =
-          short_messages_test_bit () :: (
-          if ignored
-          then [ long_messages_test_bit ()
-               , pseudorandomly_generated_messages_test_bit ()
-               ]
-          else [ ])
+        val long = if ignored then
+                     [ long_messages_test_bit ()
+                     , pseudorandomly_generated_messages_test_bit ()
+                     ]
+                   else [ ]
       in
-        &test_cases
+        &(short_messages_test_bit () :: long)
       end)
 
   fun test_sha3vs_xof_byte ignored =
