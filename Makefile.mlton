@@ -36,6 +36,7 @@ libsha3sml: libsha3sml-nodoc doc
 $(TYPECHECK_DUMMY): libsha3sml.mlb
 	@echo "  [MLTON] typecheck: $<"
 	@$(MLTON) $(MLTON_FLAGS) -stop tc $<
+	@mkdir -p $(dir $@)
 	@touch $@
 
 
